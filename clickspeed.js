@@ -55,5 +55,3 @@ document.getElementById("thingtoclick").addEventListener("contextmenu", (event) 
 })
 
 window.setInterval(update, accuracy);
-
-console.log("loaded js");

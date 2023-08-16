@@ -30,6 +30,7 @@ st{ /*small text*/
 }
 
 .topbar{
+
     background-color: rgb(70, 70, 70);
     border: 1px solid rgb(161, 161, 161);
     border-radius: 8px;
@@ -47,4 +48,9 @@ st{ /*small text*/
 
 .topbar:hover{
     background-color: rgb(85, 85, 85);
+}
+
+.pagelink{
+    color:rgb(10, 94, 173);
+    text-decoration-line: underline;
 }

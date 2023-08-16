@@ -20,6 +20,7 @@ function c6() {
 function c7() {
 }
 function c8() {
+    open("https://0bbler.github.io/clickspeed", "_self");
 }
 function c9() {
 }
