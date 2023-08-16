@@ -1,4 +1,7 @@
+var exc_mark = "";
 function c1() {
+    exc_mark+="!"
+    document.getElementById("helloWorld").innerHTML = "<st>1 </st>Hello World" + exc_mark;
 }
 function c2() {
     open("https://github.com/0BBLER");
