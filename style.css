@@ -1,0 +1,40 @@
+body{
+    background-color: rgb(0, 0, 0);
+    color:rgb(216, 216, 216);
+    font-family: "Lucida Console", monospace;
+    font-size: 16px;
+}
+
+a{
+    color:rgb(10, 94, 173);
+}
+
+p{
+    margin: 0px;
+    padding: 3px;
+    transition-duration: 200ms;
+}
+
+p:hover{
+    background-color: rgba(255, 255, 255, 0.2);
+    margin: 0px;
+    padding: 3px;
+}
+
+st{ /*small text*/
+    font-size: 10px;
+    color:rgba(216, 216, 216, 0.6);
+}
+
+.topbar{
+    background-color: rgb(70, 70, 70);
+    border: 1px solid rgb(161, 161, 161);
+    border-radius: 8px;
+    padding: 4px;
+    text-align: center;
+    transition-duration: 400ms;
+}
+
+.topbar:hover{
+    background-color: rgb(85, 85, 85);
+}
