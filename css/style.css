@@ -30,6 +30,15 @@ st {
   color: rgba(216, 216, 216, 0.6);
 }
 
+sbt{ /*sandbox tile*/
+  background-color: rgba(255, 255, 255, 0.219);
+  transition-duration: 300ms;
+}
+
+sbt:hover{
+  background-color: rgba(255, 255, 255, 0.486);
+}
+
 .topbar {
   background-color: rgb(70, 70, 70);
   border: 1px solid rgb(161, 161, 161);

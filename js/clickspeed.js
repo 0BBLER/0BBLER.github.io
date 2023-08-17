@@ -1,3 +1,9 @@
+const accuracy = 50; //check every __ms
+const canvasHeight = 300;
+const canvasWidth = window.innerWidth - 15;
+const graphUpdateMs = 20;
+const pointSpacing = 2; //graph
+const maxVisiblePoints = Math.ceil(canvasWidth / pointSpacing);
 var clicks = 0;
 var lcps = 0; //left
 var rcps = 0; //right
@@ -6,13 +12,7 @@ var leftclicklist = [];
 var rightclicklist = [];
 var rpoints = []; //right
 var lpoints = []; //left
-var accuracy = 50; //check every __ms
-var canvasHeight = 300;
-var canvasWidth = window.innerWidth - 15;
-var graphUpdateMs = 20;
-var pointSpacing = 2; //graph
 var topCps = 0;
-var maxVisiblePoints = Math.ceil(canvasWidth / pointSpacing);
 var first = true;
 
 document.getElementById("total").innerHTML =
@@ -83,6 +83,7 @@ document
 var c = document.getElementById("graph");
 c.width = canvasWidth;
 c.height = canvasHeight;
+var g = c.getContext("2d");
 
 function updateGraph() {
   rpoints.push(rcps);
@@ -93,7 +94,7 @@ function updateGraph() {
   if (lpoints.length > maxVisiblePoints) {
     lpoints.splice(0, 1);
   }
-  var g = c.getContext("2d");
+  
 
   g.clearRect(0, 0, c.width, c.height);
 
