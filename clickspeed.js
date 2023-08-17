@@ -1,57 +1,128 @@
 var clicks = 0;
-var lcps = 0;
-var rcps = 0;
-var tcps = 0;
+var lcps = 0; //left
+var rcps = 0; //right
+var tcps = 0; //total
 var leftclicklist = [];
 var rightclicklist = [];
-var accuracy = 50;
+var rpoints = []; //right
+var lpoints = []; //left
+var accuracy = 50; //check every __ms
+var canvasHeight = 300;
+var canvasWidth = window.innerWidth - 15;
+var graphUpdateMs = 20;
+var pointSpacing = 2; //graph
+var topCps = 0;
+var maxVisiblePoints = Math.ceil(canvasWidth / pointSpacing);
+var first = true;
 
-document.getElementById("total").innerHTML = "<st>8 </st>Total clicks: " + clicks;
+document.getElementById("total").innerHTML =
+  "<st>8 </st>Total clicks: " + clicks;
 
 function clicked() {
+  if (first) {
+    first = false;
+    window.setInterval(updateGraph, graphUpdateMs);
+  }
 
-    leftclicklist.push(1000);
+  leftclicklist.push(1000);
 
-    clicks++;
-    document.getElementById("total").innerHTML = "<st>8 </st>Total clicks: " + clicks;
+  clicks++;
+  document.getElementById("total").innerHTML =
+    "<st>8 </st>Total clicks: " + clicks;
 }
 function rightclicked() {
+  if (first) {
+    first = false;
+    window.setInterval(updateGraph, graphUpdateMs);
+  }
+  rightclicklist.push(1000);
 
-    rightclicklist.push(1000);
-
-    clicks++;
-    document.getElementById("total").innerHTML = "<st>8 </st>Total clicks: " + clicks;
+  clicks++;
+  document.getElementById("total").innerHTML =
+    "<st>8 </st>Total clicks: " + clicks;
 }
 
-function update() {
-    for (let i = 0; i < leftclicklist.length; i++) {
-        leftclicklist[i] -=accuracy;
-        if(leftclicklist[i]<1) {
-            leftclicklist.splice(i,1);
-            i--;
-        }
+function updateClicks() {
+  for (let i = 0; i < leftclicklist.length; i++) {
+    leftclicklist[i] -= accuracy;
+    if (leftclicklist[i] < 1) {
+      leftclicklist.splice(i, 1);
+      i--;
     }
+  }
 
-    for (let i = 0; i < rightclicklist.length; i++) {
-        rightclicklist[i] -=accuracy;
-        if(rightclicklist[i]<1) {
-            rightclicklist.splice(i,1);
-            i--;
-        }
+  for (let i = 0; i < rightclicklist.length; i++) {
+    rightclicklist[i] -= accuracy;
+    if (rightclicklist[i] < 1) {
+      rightclicklist.splice(i, 1);
+      i--;
     }
+  }
 
-    lcps = leftclicklist.length;
-    rcps = rightclicklist.length;
-    tcps = lcps+rcps;
-    
-    document.getElementById("lresult").innerHTML = "<st>5 </st>Left CPS: " + lcps;
-    document.getElementById("rresult").innerHTML = "<st>6 </st>Right CPS: " + rcps;
-    document.getElementById("tresult").innerHTML = "<st>7 </st>Combined CPS: " + tcps;
+  lcps = leftclicklist.length;
+  rcps = rightclicklist.length;
+  tcps = lcps + rcps;
+  if (tcps > topCps) {
+    topCps = tcps;
+  }
+
+  document.getElementById("lresult").innerHTML = "<st>5 </st>Left CPS: " + lcps;
+  document.getElementById("rresult").innerHTML =
+    "<st>6 </st>Right CPS: " + rcps;
+  document.getElementById("tresult").innerHTML =
+    "<st>7 </st>Combined CPS: " + tcps;
 }
 
-document.getElementById("thingtoclick").addEventListener("contextmenu", (event) => {
+document
+  .getElementById("thingtoclick")
+  .addEventListener("contextmenu", (event) => {
     event.preventDefault();
     rightclicked();
-})
+  });
 
-window.setInterval(update, accuracy);
+var c = document.getElementById("graph");
+c.width = canvasWidth;
+c.height = canvasHeight;
+
+function updateGraph() {
+  rpoints.push(rcps);
+  lpoints.push(lcps);
+  if (rpoints.length > maxVisiblePoints) {
+    rpoints.splice(0, 1);
+  }
+  if (lpoints.length > maxVisiblePoints) {
+    lpoints.splice(0, 1);
+  }
+  var g = c.getContext("2d");
+
+  g.clearRect(0, 0, c.width, c.height);
+
+  g.lineWidth = 3;
+
+  g.strokeStyle = "red";
+  g.beginPath();
+  g.moveTo(window.innerWidth - 15, canvasHeight - 50);
+  for (let i = 0; i < rpoints.length; i++) {
+    g.lineTo(
+      window.innerWidth - 15 - i * pointSpacing,
+      (-rpoints[i] / topCps) * (canvasHeight - 100) + (canvasHeight - 50)
+    );
+  }
+
+  g.stroke();
+
+  g.strokeStyle = "blue";
+  g.beginPath();
+  g.moveTo(window.innerWidth - 15, canvasHeight - 50);
+  for (let i = 0; i < lpoints.length; i++) {
+    g.lineTo(
+      window.innerWidth - 15 - i * pointSpacing,
+      (-lpoints[i] / topCps) * (canvasHeight - 100) + (canvasHeight - 50)
+    );
+  }
+
+  g.stroke();
+}
+
+window.setInterval(updateClicks, accuracy);
+updateGraph();
