@@ -17,10 +17,12 @@
         <p><st>2 </st>Inspired by <a href="https://sandspiel.club/">sandspiel.club</a></p>
         <p><st>3 </st></p>
         <p><st>4 </st><sbt onclick="reset()">|RESET|</sbt> <sbt onclick="setSelected(0)">AIR</sbt> <sbt onclick="setSelected(1)">ROCK</sbt> <sbt onclick="setSelected(2)">SAND</sbt> <sbt onclick="setSelected(3)">WATER</sbt><!-- <sbt onclick="setSelected(4)">FLOWER SEED</sbt> <sbt onclick="setSelected(5)">TREE SEED</sbt>--></p>
+        <p id="pauseBtn" onclick="togglePause()"><st>5 </st>Press space or press this to pause</p>
+        <p onclick="homeButton()"><st>6 </st>Back arrow</p>
         <br>
 
         <canvas id="game" style="position: absolute; left: 10px; top: 178px; background-color: rgb(159, 255, 255); border: 2px solid rgb(0, 132, 150)"></canvas>
-        <p onclick="homeButton()"><st>5 </st>Back arrow</p>
+        
         <script src="js/sandbox.js"></script>
         <script src="js/common.js"></script>
 
