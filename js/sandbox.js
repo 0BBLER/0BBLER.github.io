@@ -1,16 +1,35 @@
-const gamesize = 600;
-const pixelSize = 4; //explosive, do not touch
-const pixelSideCount = gamesize / pixelSize;
-const coords = getCircleCoords(5);
+const gamesize = 900;
+const pixelSize = 9; //explosive, do not touch
+const pixelSideCount = Math.round(gamesize / pixelSize);
+const coords = getCircleCoords(2);
 const colours = [
   "#9fffff",
   "#a6a6a6",
   "#dec400",
   "#1117c2",
-  "#b4ba00",
+  "#c8b378",
   "#a18852",
   "#5c3f00",
   "#239906",
+  "#ffaa00",
+];
+const hex = [
+  "0",
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+  "a",
+  "b",
+  "c",
+  "d",
+  "e",
+  "f",
 ];
 var PAUSE = false;
 var tickCounter = 1;
@@ -25,6 +44,7 @@ var pixelData = [];
  * ab: float*10 storing possible colour shift [divide by 10 for amount off (0.0-9.9)]
  * c: int storing set water flow direction [0:left,1:right,2:hibernation]
  * d: updated flag [0:false,1:true]
+ * e: type data [fire source:0,fire spread:1,future plant stuff]
  */
 var game = document.getElementById("game");
 var mouseX = 0;
@@ -49,6 +69,7 @@ game.height = gamesize;
  * 5: tree seed - falling object, turns into tree when watered
  * 6: wood† - tree bark
  * 7: green† - tree leaves & plant
+ * 8: fire - spread
  *
  *
  * †unplaceable
@@ -106,8 +127,9 @@ function tick() {
   if (!PAUSE) {
     for (let y = pixelSideCount - 1; y > -1; y--) {
       for (
+        // alternating side rendering
         let x = (pixelSideCount - 1) * (tickCounter % 2);
-        x * (tickCounter % 2) + (pixelSideCount - 1) * ((tickCounter + 1) % 2) >
+        x * (tickCounter % 2) + pixelSideCount * ((tickCounter + 1) % 2) >
         -1 * (tickCounter % 2) + x * ((tickCounter + 1) % 2);
         x += ((tickCounter + 1) % 2) * 2 - 1
       ) {
@@ -128,16 +150,9 @@ function tick() {
             } else if (current == 2 && pixels[x][y + 1] == 3) {
               //sand falls through water
               switchPixels(x, y, x, y + 1);
-            } else if (
-              current == 3 &&
-              y != pixelSideCount &&
-              x != 0 &&
-              x != pixelSideCount - 1 &&
-              y != 0
-            ) {
-              var surrounded = false;
+            } else if (current == 3) {
               //water
-              
+
               var gapleft = 0;
               var gapright = 0;
               var offset = 0;
@@ -166,7 +181,6 @@ function tick() {
                 } else if (pixels[x + offset][y] != 0) {
                   // non air pixel on the right
                   gapright = 9999;
-                  //} else if (pixels[x+offset][y+1] != 0 && pixels[x+offset][y+1] != 3) { // non air or water pixel on the right one row down
                   //  gapright = 9999;
                 } else if (pixels[x + offset][y + 1] == 0) {
                   // gapright set to the distance to the air pixel on the right one row down
@@ -192,7 +206,6 @@ function tick() {
                 if (x != 0) {
                   if (pixels[x - 1][y] == 0) {
                     switchPixels(x - 1, y, x, y);
-                  } else {
                   }
                 }
               } else if (pixelData[x][y].charAt(2) == "1") {
@@ -235,27 +248,65 @@ function togglePause() {
 
 function setPixel(x, y, set, createNewData) {
   pixels[x][y] = set;
-  pixelData[x][y] = replaceChar(pixelData[x][y], 3, "1");
+  //pixelData[x][y] = replaceChar(pixelData[x][y], 3, "1");
   if (createNewData) {
     if (set == 3) {
-      pixelData[x][y] = createMetadata(true);
+      pixelData[x][y] = createMetadata(3);
+    } else if (set == 2) {
+      pixelData[x][y] = createMetadata(5);
+    } else if (set == 1 || set == 6) {
+      pixelData[x][y] = createMetadata(2);
     } else {
-      pixelData[x][y] = createMetadata(false);
+      pixelData[x][y] = createMetadata(0);
     }
   }
-  g.fillStyle = colours[set];
+  let col = colours[set];
+
+  col = replaceChar(
+    col,
+    1,
+    changeHex(colours[set].charAt(1), -pixelData[x][y].charAt(0))
+  );
+  col = replaceChar(
+    col,
+    2,
+    changeHex(colours[set].charAt(2), -pixelData[x][y].charAt(1))
+  );
+
+  col = replaceChar(
+    col,
+    3,
+    changeHex(colours[set].charAt(3), -pixelData[x][y].charAt(0))
+  );
+  col = replaceChar(
+    col,
+    4,
+    changeHex(colours[set].charAt(4), -pixelData[x][y].charAt(1))
+  );
+
+  col = replaceChar(
+    col,
+    5,
+    changeHex(colours[set].charAt(5), -pixelData[x][y].charAt(0))
+  );
+  col = replaceChar(
+    col,
+    6,
+    changeHex(colours[set].charAt(6), -pixelData[x][y].charAt(1))
+  );
+
+  g.fillStyle = col;
+
   g.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
 }
 
 function switchPixels(x1, y1, x2, y2) {
-  //replaceChar(pixelData[x1][y1], 3, "1");
-  //replaceChar(pixelData[x2][y2], 3, "1");
   let origData = pixelData[x1][y1];
   let origPixel = pixels[x1][y1];
-  setPixel(x1, y1, pixels[x2][y2], false);
   pixelData[x1][y1] = pixelData[x2][y2];
-  setPixel(x2, y2, origPixel, false);
+  setPixel(x1, y1, pixels[x2][y2], false);
   pixelData[x2][y2] = origData.toString();
+  setPixel(x2, y2, origPixel, false);
 }
 
 function replaceChar(string, i, char) {
@@ -276,10 +327,14 @@ function getCircleCoords(r) {
   return coords;
 }
 
-function createMetadata(isWater) {
+function createMetadata(randAmount) {
   let data = "";
-  if (isWater) {
-    data = "00" + rand(2) + "0";
+  if (randAmount > 0) {
+    data =
+      rand(randAmount).toString() +
+      rand(10).toString() +
+      rand(2).toString() +
+      "0";
   } else {
     data = "0000";
   }
@@ -310,6 +365,17 @@ window.addEventListener("mousedown", () => {
 window.addEventListener("mouseup", () => {
   mousedown = false;
 });
+
+function changeHex(val, amnt) {
+  let start = hex.indexOf(val);
+  if (start + amnt < 0) {
+    return hex[0];
+  }
+  if (start + amnt > hex.length - 1) {
+    return hex[hex.length - 1];
+  }
+  return hex[start + amnt];
+}
 
 function rand(max) {
   return Math.floor(Math.random() * max);
