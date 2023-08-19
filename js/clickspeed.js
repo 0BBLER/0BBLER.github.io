@@ -4,15 +4,19 @@ const canvasWidth = window.innerWidth - 15;
 const graphUpdateMs = 20;
 const pointSpacing = 2; //graph
 const maxVisiblePoints = Math.ceil(canvasWidth / pointSpacing);
+const graphSteps = 3;
 var clicks = 0;
 var lcps = 0; //left
+var toplcps = 0;
 var rcps = 0; //right
+var toprcps = 0;
 var tcps = 0; //total
+var topCps = 0;
 var leftclicklist = [];
 var rightclicklist = [];
 var rpoints = []; //right
 var lpoints = []; //left
-var topCps = 0;
+var graphTop = 0;
 var first = true;
 
 document.getElementById("total").innerHTML =
@@ -60,17 +64,31 @@ function updateClicks() {
   }
 
   lcps = leftclicklist.length;
+  if (lcps > toplcps) {
+    toplcps = lcps;
+  }
   rcps = rightclicklist.length;
+  if (rcps > toprcps) {
+    toprcps = rcps;
+  }
+
+  if (rcps > graphTop) {
+    graphTop = rcps;
+  }
+  if (lcps > graphTop) {
+    graphTop = lcps;
+  }
   tcps = lcps + rcps;
   if (tcps > topCps) {
     topCps = tcps;
   }
 
-  document.getElementById("lresult").innerHTML = "<st>5 </st>Left CPS: " + lcps;
+  document.getElementById("lresult").innerHTML =
+    "<st>5 </st>Left CPS: " + lcps + " | Best: " + toplcps;
   document.getElementById("rresult").innerHTML =
-    "<st>6 </st>Right CPS: " + rcps;
+    "<st>6 </st>Right CPS: " + rcps + "| Best: " + toprcps;
   document.getElementById("tresult").innerHTML =
-    "<st>7 </st>Combined CPS: " + tcps;
+    "<st>7 </st>Combined CPS: " + tcps + "| Best: " + topCps;
 }
 
 document
@@ -94,9 +112,22 @@ function updateGraph() {
   if (lpoints.length > maxVisiblePoints) {
     lpoints.splice(0, 1);
   }
-  
 
   g.clearRect(0, 0, c.width, c.height);
+
+  g.lineWidth = 2;
+  g.strokeStyle = "rgba(75, 75, 75, 0.31)";
+  g.fillStyle = "rgba(75, 75, 75, 0.7)";
+
+  g.beginPath();
+  for (let y = 0; y < 3 + Math.ceil(graphTop / graphSteps); y++) {
+    let yCoord =
+      canvasHeight - 50 - ((graphSteps * y) / graphTop) * (canvasHeight - 100);
+    g.moveTo(0, yCoord);
+    g.lineTo(canvasWidth, yCoord);
+    g.fillText(graphSteps * y, canvasWidth / 2, yCoord);
+  }
+  g.stroke();
 
   g.lineWidth = 3;
 
@@ -106,7 +137,7 @@ function updateGraph() {
   for (let i = 0; i < rpoints.length; i++) {
     g.lineTo(
       window.innerWidth - 15 - i * pointSpacing,
-      (-rpoints[i] / topCps) * (canvasHeight - 100) + (canvasHeight - 50)
+      (-rpoints[i] / graphTop) * (canvasHeight - 100) + (canvasHeight - 50)
     );
   }
 
@@ -118,7 +149,7 @@ function updateGraph() {
   for (let i = 0; i < lpoints.length; i++) {
     g.lineTo(
       window.innerWidth - 15 - i * pointSpacing,
-      (-lpoints[i] / topCps) * (canvasHeight - 100) + (canvasHeight - 50)
+      (-lpoints[i] / graphTop) * (canvasHeight - 100) + (canvasHeight - 50)
     );
   }
 
