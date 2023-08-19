@@ -1,7 +1,7 @@
 const gamesize = 900;
 const pixelSize = 9; //explosive, do not touch
 const pixelSideCount = Math.round(gamesize / pixelSize);
-const coords = getCircleCoords(2);
+const canvasYCoord = 210;
 const colours = [
   "#9fffff",
   "#a6a6a6",
@@ -11,7 +11,7 @@ const colours = [
   "#a18852",
   "#5c3f00",
   "#239906",
-  "#ffaa00",
+  "#ff7f00",
 ];
 const hex = [
   "0",
@@ -38,10 +38,10 @@ var pixelData = [];
 /**
  * PIXELDATA ENCODING
  *
- * 0123
- * abcd
+ * 01234
+ * abcde
  *
- * ab: float*10 storing possible colour shift [divide by 10 for amount off (0.0-9.9)]
+ * ab: hex number storing possible colour shift
  * c: int storing set water flow direction [0:left,1:right,2:hibernation]
  * d: updated flag [0:false,1:true]
  * e: type data [fire source:0,fire spread:1,future plant stuff]
@@ -53,8 +53,11 @@ var mcx = 0; //mouse canvas x
 var mcy = 0; //mouse canvas y
 var mousedown = false;
 var placeType = 2;
+var brushSize = 4;
+var circlePoints = getCircleCoords(brushSize);
 game.width = gamesize;
 game.height = gamesize;
+game.style.top = canvasYCoord + "px";
 
 //const updateDelay = 40; //ms, no longer used
 
@@ -99,27 +102,41 @@ function tick() {
     // placement
     let hoverX = Math.round(mcx / pixelSize);
     let hoverY = Math.round(mcy / pixelSize);
-    for (let i = 0; i < coords.length; i++) {
+    for (let i = 0; i < circlePoints.length; i++) {
       if (
-        hoverX + coords[i].x < pixelSideCount &&
-        hoverX + coords[i].x > -1 &&
-        hoverY + coords[i].y < pixelSideCount &&
-        hoverY + coords[i].y > -1 &&
-        (pixels[hoverX + coords[i].x][hoverY + coords[i].y] == 0 ||
+        hoverX + circlePoints[i].x < pixelSideCount &&
+        hoverX + circlePoints[i].x > -1 &&
+        hoverY + circlePoints[i].y < pixelSideCount &&
+        hoverY + circlePoints[i].y > -1 &&
+        (pixels[hoverX + circlePoints[i].x][hoverY + circlePoints[i].y] == 0 ||
           placeType == 0)
       ) {
         if (placeType == 2 || placeType == 3) {
           // make sand and water placement grainy
           if (rand(10) < 4) {
             setPixel(
-              hoverX + coords[i].x,
-              hoverY + coords[i].y,
+              hoverX + circlePoints[i].x,
+              hoverY + circlePoints[i].y,
               placeType,
               true
             );
           }
+        } else if (placeType == 8) {
+          // all fire placement is spread fire
+          setPixel(
+            hoverX + circlePoints[i].x,
+            hoverY + circlePoints[i].y,
+            placeType,
+            true,
+            1
+          );
         } else {
-          setPixel(hoverX + coords[i].x, hoverY + coords[i].y, placeType, true);
+          setPixel(
+            hoverX + circlePoints[i].x,
+            hoverY + circlePoints[i].y,
+            placeType,
+            true
+          );
         }
       }
     }
@@ -127,7 +144,7 @@ function tick() {
   if (!PAUSE) {
     for (let y = pixelSideCount - 1; y > -1; y--) {
       for (
-        // alternating side rendering
+        // alternating side simulations
         let x = (pixelSideCount - 1) * (tickCounter % 2);
         x * (tickCounter % 2) + pixelSideCount * ((tickCounter + 1) % 2) >
         -1 * (tickCounter % 2) + x * ((tickCounter + 1) % 2);
@@ -217,6 +234,93 @@ function tick() {
                 }
               }
             }
+          } else if (current == 8) {
+            // fire stuff
+            let stillFire = true;
+            let left = x == 0;
+            let right = x == pixelSideCount - 1;
+            let bottom = y == pixelSideCount - 1;
+            let top = y == 0;
+            if (pixelData[x][y].charAt(4) == "1") {
+              // test for it is a spread fire, if so, try spreading
+              // also test for getting watered
+              let nearWood = false;
+              if (!left) {
+                if (pixels[x - 1][y] == 6) {
+                  console.log("created fire");
+                  nearWood = true;
+                  setPixel(x - 1, y, 8, false, 0);
+                }
+                if (pixels[x - 1][y] == 3) {
+                  setPixel(x, y, 0, true);
+                  stillFire = false;
+                }
+              }
+              if (!right && stillFire) {
+                if (pixels[x + 1][y] == 6) {
+                  nearWood = true;
+                  setPixel(x + 1, y, 8, false, 0);
+                }
+                if (pixels[x + 1][y] == 3) {
+                  setPixel(x, y, 0, true);
+                  stillFire = false;
+                }
+              }
+              if (!top && stillFire) {
+                if (pixels[x][y - 1] == 6) {
+                  nearWood = true;
+                  setPixel(x, y - 1, 8, false, 0);
+                }
+                if (pixels[x][y - 1] == 3) {
+                  setPixel(x, y, 0, true);
+                  stillFire = false;
+                }
+              }
+              if (!bottom && stillFire) {
+                if (pixels[x][y + 1] == 6) {
+                  nearWood = true;
+                  setPixel(x, y + 1, 8, false, 0);
+                }
+                if (pixels[x][y + 1] == 3) {
+                  setPixel(x, y, 0, true);
+                  stillFire = false;
+                }
+              }
+              if (!nearWood) {
+                // if it is not near wood, go out
+                setPixel(x, y, 0, true);
+              }
+            } else {
+              // source fire
+              // test for water
+              let action = rand(1000);
+              let stillfire = true;
+              if (!left) {
+                if (pixels[x - 1][y] == 3) {
+                  setPixel(x, y, 0, true);
+                  stillFire = false;
+                }
+              }
+              if (!right && stillFire) {
+                if (pixels[x + 1][y] == 3) {
+                  setPixel(x, y, 0, true);
+                  stillFire = false;
+                }
+              }
+              if (!top && stillFire) {
+                if (pixels[x][y - 1] == 3) {
+                  setPixel(x, y, 0, true);
+                  stillFire = false;
+                }
+              }
+              if (!bottom && stillFire) {
+                if (pixels[x][y + 1] == 3) {
+                  setPixel(x, y, 0, true);
+                  stillFire = false;
+                }
+              }
+              fireAction(action, x, y, left, right, bottom, top);
+            }
           }
         }
       }
@@ -224,6 +328,37 @@ function tick() {
   }
 
   window.requestAnimationFrame(tick);
+}
+
+function fireAction(action, x, y, left, right, bottom, top) {
+  if (action < 2) {
+    //spread
+    if (!left) {
+      if (pixels[x - 1][y] == 6) {
+        setPixel(x - 1, y, 8, true, 0);
+      }
+    }
+    if (!right) {
+      if (pixels[x + 1][y] == 6) {
+        setPixel(x + 1, y, 8, true, 0);
+      }
+    }
+    if (!top) {
+      if (pixels[x][y - 1] == 6) {
+        setPixel(x, y - 1, 8, true, 0);
+      }
+    }
+    if (!bottom) {
+      if (pixels[x][y + 1] == 6) {
+        setPixel(x, y + 1, 8, true, 0);
+      }
+    }
+  } else {
+    if (action < 2) {
+      //burn out
+      setPixel(x, y, 0, true);
+    }
+  }
 }
 
 function setSelected(type) {
@@ -246,19 +381,22 @@ function togglePause() {
   }
 }
 
-function setPixel(x, y, set, createNewData) {
+function setPixel(x, y, set, createNewData, typeData) {
   pixels[x][y] = set;
   //pixelData[x][y] = replaceChar(pixelData[x][y], 3, "1");
   if (createNewData) {
     if (set == 3) {
       pixelData[x][y] = createMetadata(3);
-    } else if (set == 2) {
+    } else if (set == 2 || set == 8) {
       pixelData[x][y] = createMetadata(5);
     } else if (set == 1 || set == 6) {
       pixelData[x][y] = createMetadata(2);
     } else {
       pixelData[x][y] = createMetadata(0);
     }
+  }
+  if (typeData != null && typeData != undefined) {
+    pixelData[x][y] = replaceChar(pixelData[x][y], 4, typeData.toString());
   }
   let col = colours[set];
 
@@ -272,7 +410,6 @@ function setPixel(x, y, set, createNewData) {
     2,
     changeHex(colours[set].charAt(2), -pixelData[x][y].charAt(1))
   );
-
   col = replaceChar(
     col,
     3,
@@ -283,7 +420,6 @@ function setPixel(x, y, set, createNewData) {
     4,
     changeHex(colours[set].charAt(4), -pixelData[x][y].charAt(1))
   );
-
   col = replaceChar(
     col,
     5,
@@ -296,7 +432,6 @@ function setPixel(x, y, set, createNewData) {
   );
 
   g.fillStyle = col;
-
   g.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
 }
 
@@ -334,9 +469,9 @@ function createMetadata(randAmount) {
       rand(randAmount).toString() +
       rand(10).toString() +
       rand(2).toString() +
-      "0";
+      "00";
   } else {
-    data = "0000";
+    data = "00000";
   }
   return data.toString();
 }
@@ -356,7 +491,7 @@ window.addEventListener("mousemove", (event) => {
   mouseX = event.clientX;
   mcx = mouseX - 10;
   mouseY = event.clientY;
-  mcy = mouseY - 190;
+  mcy = mouseY - canvasYCoord + document.documentElement.scrollTop;
 });
 
 window.addEventListener("mousedown", () => {
@@ -365,6 +500,19 @@ window.addEventListener("mousedown", () => {
 window.addEventListener("mouseup", () => {
   mousedown = false;
 });
+
+function changeBrushSize(amnt) {
+  if (brushSize + changeBrushSize < 1) {
+    brushSize = 0;
+  } else {
+    brushSize += amnt;
+  }
+  document.getElementById("brushSizer").innerHTML =
+    '<st>5 </st>Brush size: <sbt onclick="changeBrushSize(-1)">&lt;</sbt> ' +
+    brushSize +
+    ' <sbt onclick="changeBrushSize(1)">&gt;</sbt>';
+  circlePoints = getCircleCoords(brushSize);
+}
 
 function changeHex(val, amnt) {
   let start = hex.indexOf(val);
