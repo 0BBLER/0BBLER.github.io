@@ -11,8 +11,9 @@ const colours = [
   "#a18852",
   "#5c3f00",
   "#239906",
-  "#ff7f00",
+  "#ffde3b",
 ];
+const spreadFireCol = "#ff7f00";
 const hex = [
   "0",
   "1",
@@ -109,7 +110,10 @@ function tick() {
         hoverY + circlePoints[i].y < pixelSideCount &&
         hoverY + circlePoints[i].y > -1 &&
         (pixels[hoverX + circlePoints[i].x][hoverY + circlePoints[i].y] == 0 ||
-          placeType == 0)
+          placeType == 0 ||
+          (pixels[hoverX + circlePoints[i].x][hoverY + circlePoints[i].y] ==
+            6 &&
+            placeType == 8))
       ) {
         if (placeType == 2 || placeType == 3) {
           // make sand and water placement grainy
@@ -122,14 +126,18 @@ function tick() {
             );
           }
         } else if (placeType == 8) {
-          // all fire placement is spread fire
-          setPixel(
-            hoverX + circlePoints[i].x,
-            hoverY + circlePoints[i].y,
-            placeType,
-            true,
-            1
-          );
+          // all fire placement is source fire
+          if (
+            pixels[hoverX + circlePoints[i].x][hoverY + circlePoints[i].y] == 6
+          ) {
+            setPixel(
+              hoverX + circlePoints[i].x,
+              hoverY + circlePoints[i].y,
+              placeType,
+              true,
+              0
+            );
+          }
         } else {
           setPixel(
             hoverX + circlePoints[i].x,
@@ -242,59 +250,40 @@ function tick() {
             let bottom = y == pixelSideCount - 1;
             let top = y == 0;
             if (pixelData[x][y].charAt(4) == "1") {
+              let action = rand(1000);
               // test for it is a spread fire, if so, try spreading
               // also test for getting watered
-              let nearWood = false;
+
               if (!left) {
-                if (pixels[x - 1][y] == 6) {
-                  console.log("created fire");
-                  nearWood = true;
-                  setPixel(x - 1, y, 8, false, 0);
-                }
                 if (pixels[x - 1][y] == 3) {
                   setPixel(x, y, 0, true);
                   stillFire = false;
                 }
               }
               if (!right && stillFire) {
-                if (pixels[x + 1][y] == 6) {
-                  nearWood = true;
-                  setPixel(x + 1, y, 8, false, 0);
-                }
                 if (pixels[x + 1][y] == 3) {
                   setPixel(x, y, 0, true);
                   stillFire = false;
                 }
               }
               if (!top && stillFire) {
-                if (pixels[x][y - 1] == 6) {
-                  nearWood = true;
-                  setPixel(x, y - 1, 8, false, 0);
-                }
                 if (pixels[x][y - 1] == 3) {
                   setPixel(x, y, 0, true);
                   stillFire = false;
                 }
               }
               if (!bottom && stillFire) {
-                if (pixels[x][y + 1] == 6) {
-                  nearWood = true;
-                  setPixel(x, y + 1, 8, false, 0);
-                }
                 if (pixels[x][y + 1] == 3) {
                   setPixel(x, y, 0, true);
                   stillFire = false;
                 }
               }
-              if (!nearWood) {
-                // if it is not near wood, go out
-                setPixel(x, y, 0, true);
-              }
+
+              fireAction(action, x, y, left, right, bottom, top, 1);
             } else {
               // source fire
               // test for water
               let action = rand(1000);
-              let stillfire = true;
               if (!left) {
                 if (pixels[x - 1][y] == 3) {
                   setPixel(x, y, 0, true);
@@ -319,7 +308,7 @@ function tick() {
                   stillFire = false;
                 }
               }
-              fireAction(action, x, y, left, right, bottom, top);
+              fireAction(action, x, y, left, right, bottom, top, 0);
             }
           }
         }
@@ -330,33 +319,114 @@ function tick() {
   window.requestAnimationFrame(tick);
 }
 
-function fireAction(action, x, y, left, right, bottom, top) {
-  if (action < 2) {
-    //spread
-    if (!left) {
-      if (pixels[x - 1][y] == 6) {
-        setPixel(x - 1, y, 8, true, 0);
+function fireAction(action, x, y, left, right, bottom, top, fireType) {
+  if (fireType == 0) {
+    //source fire
+    if (action < 10) {
+      //spread through wood
+      if (!left) {
+        if (pixels[x - 1][y] == 6) {
+          setPixel(x - 1, y, 8, true, 0);
+        }
       }
-    }
-    if (!right) {
-      if (pixels[x + 1][y] == 6) {
-        setPixel(x + 1, y, 8, true, 0);
+      if (!right) {
+        if (pixels[x + 1][y] == 6) {
+          setPixel(x + 1, y, 8, true, 0);
+        }
       }
-    }
-    if (!top) {
-      if (pixels[x][y - 1] == 6) {
-        setPixel(x, y - 1, 8, true, 0);
+      if (!top) {
+        if (pixels[x][y - 1] == 6) {
+          setPixel(x, y - 1, 8, true, 0);
+        }
       }
-    }
-    if (!bottom) {
-      if (pixels[x][y + 1] == 6) {
-        setPixel(x, y + 1, 8, true, 0);
+      if (!bottom) {
+        if (pixels[x][y + 1] == 6) {
+          setPixel(x, y + 1, 8, true, 0);
+        }
+      }
+    } else {
+      if (action < 13) {
+        //burn out
+        setPixel(x, y, 0, true);
+      } else {
+        if (action < 500) {
+          //spread by spread fire
+          if (!left) {
+            if (pixels[x - 1][y] == 0) {
+              setPixel(x - 1, y, 8, true, 1);
+            }
+          }
+          if (!right) {
+            if (pixels[x + 1][y] == 0) {
+              setPixel(x + 1, y, 8, true, 1);
+            }
+          }
+          if (!top) {
+            if (pixels[x][y - 1] == 0) {
+              setPixel(x, y - 1, 8, true, 1);
+            }
+          }
+        }
       }
     }
   } else {
-    if (action < 2) {
+    //spread fire
+    let nearSource = false;
+    if (!left) {
+      if (pixels[x - 1][y] == 8) {
+        if (pixelData[x - 1][y].charAt(4) == 0) {
+          nearSource = true;
+        }
+      }
+    }
+    if (!right) {
+      if (pixels[x + 1][y] == 8) {
+        if (pixelData[x + 1][y].charAt(4) == 0) {
+          nearSource = true;
+        }
+      }
+    }
+    if (!top) {
+      if (pixels[x][y - 1] == 8) {
+        if (pixelData[x][y - 1].charAt(4) == 0) {
+          nearSource = true;
+        }
+      }
+    }
+    if (!bottom) {
+      if (pixels[x][y + 1] == 8) {
+        if (pixelData[x][y + 1].charAt(4) == 0) {
+          nearSource = true;
+        }
+      }
+    }
+    if (action > 99 && action < 120) {
+      if (!left) {
+        if (pixels[x - 1][y] == 0) {
+          setPixel(x - 1, y, 8, true, 1);
+        }
+      }
+      if (!right) {
+        if (pixels[x + 1][y] == 0) {
+          setPixel(x + 1, y, 8, true, 1);
+        }
+      }
+      if (!top) {
+        if (pixels[x][y - 1] == 0) {
+          setPixel(x, y - 1, 8, true, 1);
+        }
+      }
+      if (!bottom) {
+        if (pixels[x][y + 1] == 0) {
+          setPixel(x, y + 1, 8, true, 1);
+        }
+      }
+    }
+    if (!nearSource) {
       //burn out
-      setPixel(x, y, 0, true);
+      if (action < 100) {
+        setPixel(x, y, 0, true);
+      }
     }
   }
 }
@@ -398,37 +468,44 @@ function setPixel(x, y, set, createNewData, typeData) {
   if (typeData != null && typeData != undefined) {
     pixelData[x][y] = replaceChar(pixelData[x][y], 4, typeData.toString());
   }
+  let origColor = colours[set];
   let col = colours[set];
+  if (set == 8) {
+    if (typeData == 1) {
+      origColor = spreadFireCol;
+      col = spreadFireCol;
+    }
+  }
 
   col = replaceChar(
     col,
     1,
-    changeHex(colours[set].charAt(1), -pixelData[x][y].charAt(0))
+    changeHex(origColor.charAt(1), -pixelData[x][y].charAt(0))
   );
   col = replaceChar(
     col,
     2,
-    changeHex(colours[set].charAt(2), -pixelData[x][y].charAt(1))
+    changeHex(origColor.charAt(2), -pixelData[x][y].charAt(1))
   );
   col = replaceChar(
     col,
     3,
-    changeHex(colours[set].charAt(3), -pixelData[x][y].charAt(0))
+    changeHex(origColor.charAt(3), -pixelData[x][y].charAt(0))
   );
   col = replaceChar(
     col,
     4,
-    changeHex(colours[set].charAt(4), -pixelData[x][y].charAt(1))
+    changeHex(origColor.charAt(4), -pixelData[x][y].charAt(1))
   );
   col = replaceChar(
     col,
     5,
-    changeHex(colours[set].charAt(5), -pixelData[x][y].charAt(0))
+    changeHex(origColor.charAt(5), -pixelData[x][y].charAt(0))
   );
   col = replaceChar(
     col,
     6,
-    changeHex(colours[set].charAt(6), -pixelData[x][y].charAt(1))
+    changeHex(origColor.charAt(6), -pixelData[x][y].charAt(1))
   );
 
   g.fillStyle = col;
