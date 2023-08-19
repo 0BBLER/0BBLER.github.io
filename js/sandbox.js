@@ -12,7 +12,7 @@ const colours = [
   "#5c3f00",
   "#239906",
 ];
-var PAUSE = true;
+var PAUSE = false;
 var tickCounter = 1;
 var pixels = [];
 var pixelData = [];
@@ -128,9 +128,16 @@ function tick() {
             } else if (current == 2 && pixels[x][y + 1] == 3) {
               //sand falls through water
               switchPixels(x, y, x, y + 1);
-            } else if (current == 3 && y != pixelSideCount) {
+            } else if (
+              current == 3 &&
+              y != pixelSideCount &&
+              x != 0 &&
+              x != pixelSideCount - 1 &&
+              y != 0
+            ) {
+              var surrounded = false;
               //water
-              // Adding some dad code
+              
               var gapleft = 0;
               var gapright = 0;
               var offset = 0;
@@ -143,8 +150,6 @@ function tick() {
                 } else if (pixels[x - offset][y] != 0) {
                   // non air pixel on the left
                   gapleft = 9999;
-                  //} else if (pixels[x-offset][y+1] != 0 && pixels[x-offset][y+1] != 3) { // non air or water pixel on the left one row down
-                  //  gapleft = 9999;
                 } else if (pixels[x - offset][y + 1] == 0) {
                   // gapleft set to the distance to the air pixel on the left one row down
                   gapleft = offset;
@@ -173,7 +178,7 @@ function tick() {
                 pixelData[x][y] = replaceChar(pixelData[x][y], 2, "2"); // hibernate - redundant?
               } else if (gapleft < gapright) {
                 pixelData[x][y] = replaceChar(pixelData[x][y], 2, "0"); // left
-              } else if (gapright < gapleft) {
+              } else if (gapright <= gapleft) {
                 pixelData[x][y] = replaceChar(pixelData[x][y], 2, "1"); // right
               } else
                 pixelData[x][y] = replaceChar(
@@ -182,85 +187,21 @@ function tick() {
                   rand(2).toString
                 ); //gapleft = gapright, so go in random direction
 
-              // end of dad code
-
-              /*
-          if (
-            pixelData[x][y].charAt(2) == "1" && //right
-            x == pixelSideCount
-          ) {
-            replaceChar(pixelData[x][y], 2, "0");
-          }
-          if (
-            (pixelData[x][y].charAt(2) == "0" && x == 0) ||
-            (pixelData[x][y].charAt(2) == "0" && pixels[x - 1][y] == null)
-          ) {
-            //left
-            replaceChar(pixelData[x][y], 2, "1");
-          }
-
-          if (pixels[x][y + 1] != 0) {
-            if (pixelData[x][y].charAt(2) == "0" && x != 0) {
-              //left
-              if (pixels[x - 1][y] != 0) {
-                //if left is air
-                switchPixels(x, y, x - 1, y);
-              }
-            }
-            if (pixelData[x][y].charAt(2) == "1" && x != pixelSideCount - 1) {
-              //right
-              if (pixels[x + 1][y] != 0) {
-                //if right is air
-                switchPixels(x, y, x + 1, y);
-              }
-            }
-          }
-          */
-
               if (pixelData[x][y].charAt(2) == "0") {
                 //left
                 if (x != 0) {
                   if (pixels[x - 1][y] == 0) {
                     switchPixels(x - 1, y, x, y);
                   } else {
-                    /*
-                  if (x != pixelSideCount - 1) {
-                    if (pixels[x + 1][y] == 0) {
-                      pixelData[x][y] = replaceChar(pixelData[x][y], 2, "1");
-                      switchPixels(x + 1, y, x, y);
-                    }
-                  }
-                  */
-                  }
-                } /* else {
-                if (x != pixelSideCount - 1) {
-                  if (pixels[x + 1][y] == 0) {
-                    pixelData[x][y] = replaceChar(pixelData[x][y], 2, "1");
-                    switchPixels(x + 1, y, x, y);
                   }
                 }
-              }*/
               } else if (pixelData[x][y].charAt(2) == "1") {
                 //right
                 if (x != pixelSideCount - 1) {
                   if (pixels[x + 1][y] == 0) {
                     switchPixels(x + 1, y, x, y);
-                  } else {
-                    /*
-                  if (x != 0) {
-                    if (pixels[x - 1][y] == 0) {
-                      pixelData[x][y] = replaceChar(pixelData[x][y], 2, "0");
-                      switchPixels(x - 1, y, x, y);
-                    }
                   }
-                  */
-                  }
-                } /*else {
-                if (pixels[x - 1][y] == 0) {
-                  pixelData[x][y] = replaceChar(pixelData[x][y], 2, "0");
-                  switchPixels(x - 1, y, x, y);
                 }
-              }*/
               }
             }
           }
@@ -285,8 +226,7 @@ document.body.onkeyup = function (e) {
 function togglePause() {
   PAUSE = !PAUSE;
   if (PAUSE) {
-    document.getElementById("pauseBtn").innerHTML =
-      "<st>5 </st>Paused";
+    document.getElementById("pauseBtn").innerHTML = "<st>5 </st>Paused";
   } else {
     document.getElementById("pauseBtn").innerHTML =
       "<st>5 </st>Press space or press this to pause";
@@ -361,7 +301,7 @@ window.addEventListener("mousemove", (event) => {
   mouseX = event.clientX;
   mcx = mouseX - 10;
   mouseY = event.clientY;
-  mcy = mouseY - 178;
+  mcy = mouseY - 190;
 });
 
 window.addEventListener("mousedown", () => {
