@@ -22,7 +22,7 @@ function c8() {
   open("https://0bbler.github.io/sandbox", "_self");
 }
 function c9() {
-  open("https://0bbler.github.io/clickspeed", "_self");
+  open("https://0bbler.github.io/element", "_self");
 }
-function c10() {}
+function c10() {open("https://0bbler.github.io/clickspeed", "_self");}
 function c11() {}

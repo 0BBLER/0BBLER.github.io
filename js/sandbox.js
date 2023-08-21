@@ -14,6 +14,7 @@ const colours = [
   "#ffde3b",
 ];
 const spreadFireCol = "#ff7f00";
+const charredWoodCol = "#261c00";
 const hex = [
   "0",
   "1",
@@ -32,8 +33,14 @@ const hex = [
   "e",
   "f",
 ];
+var airBtn = document.getElementById("air");
+var rockBtn = document.getElementById("rock");
+var sandBtn = document.getElementById("sand");
+var waterBtn = document.getElementById("water");
+var woodBtn = document.getElementById("wood");
+var fireBtn = document.getElementById("fire");
 var PAUSE = false;
-var tickCounter = 1;
+var tickCounter = 0;
 var pixels = [];
 var pixelData = [];
 /**
@@ -45,7 +52,7 @@ var pixelData = [];
  * ab: hex number storing possible colour shift
  * c: int storing set water flow direction [0:left,1:right,2:hibernation]
  * d: updated flag [0:false,1:true]
- * e: type data [fire source:0,fire spread:1,future plant stuff]
+ * e: type data [fire source:0,fire spread:1,wood normal:0,wood charred:1]
  */
 var game = document.getElementById("game");
 var mouseX = 0;
@@ -54,7 +61,14 @@ var mcx = 0; //mouse canvas x
 var mcy = 0; //mouse canvas y
 var mousedown = false;
 var placeType = 2;
-var brushSize = 4;
+sandBtn.classList.add("tbSelected");
+var brushSize = 3;
+
+document.getElementById("brushSizer").innerHTML =
+  '<st>5 </st>Brush size: <tb onclick="changeBrushSize(-1)">&lt;</tb> ' +
+  brushSize +
+  ' <tb onclick="changeBrushSize(1)">&gt;</tb>';
+
 var circlePoints = getCircleCoords(brushSize);
 game.width = gamesize;
 game.height = gamesize;
@@ -109,11 +123,15 @@ function tick() {
         hoverX + circlePoints[i].x > -1 &&
         hoverY + circlePoints[i].y < pixelSideCount &&
         hoverY + circlePoints[i].y > -1 &&
+        //make sure placement is only on air unless it's fire or water
         (pixels[hoverX + circlePoints[i].x][hoverY + circlePoints[i].y] == 0 ||
           placeType == 0 ||
           (pixels[hoverX + circlePoints[i].x][hoverY + circlePoints[i].y] ==
             6 &&
-            placeType == 8))
+            placeType == 8) ||
+          (pixels[hoverX + circlePoints[i].x][hoverY + circlePoints[i].y] ==
+            8 &&
+            placeType == 3))
       ) {
         if (placeType == 2 || placeType == 3) {
           // make sand and water placement grainy
@@ -126,7 +144,7 @@ function tick() {
             );
           }
         } else if (placeType == 8) {
-          // all fire placement is source fire
+          // all fire placed is source fire
           if (
             pixels[hoverX + circlePoints[i].x][hoverY + circlePoints[i].y] == 6
           ) {
@@ -164,13 +182,14 @@ function tick() {
           if (current > 1 && current < 6) {
             //if it is a gravity-affected tile, induce gravity
             if (pixels[x][y + 1] == 0) {
-              if (current == 3) {
+              // try commenting out the code below - why doesn't this eliminate the issue with the offset water???
+              /*if (current == 3) {
                 pixelData[x][y] = replaceChar(
                   pixelData[x][y],
                   2,
-                  rand(2).toString
+                  "1"
                 );
-              }
+              } */
               switchPixels(x, y + 1, x, y);
             } else if (current == 2 && pixels[x][y + 1] == 3) {
               //sand falls through water
@@ -217,30 +236,33 @@ function tick() {
                 pixelData[x][y] = replaceChar(pixelData[x][y], 2, "2"); // hibernate - redundant?
               } else if (gapleft < gapright) {
                 pixelData[x][y] = replaceChar(pixelData[x][y], 2, "0"); // left
-              } else if (gapright <= gapleft) {
+              } else if (gapright < gapleft) {
                 pixelData[x][y] = replaceChar(pixelData[x][y], 2, "1"); // right
               } else
                 pixelData[x][y] = replaceChar(
                   pixelData[x][y],
                   2,
-                  rand(2).toString
-                ); //gapleft = gapright, so go in random direction
+                  ((tickCounter + 1) % 2).toString()
+                ); //gapleft = gapright, so go in direction against the scan, though it doesn't seem to matter
 
               if (pixelData[x][y].charAt(2) == "0") {
-                //left
+                //left flow
                 if (x != 0) {
                   if (pixels[x - 1][y] == 0) {
                     switchPixels(x - 1, y, x, y);
                   }
                 }
               } else if (pixelData[x][y].charAt(2) == "1") {
-                //right
+                //right flow
                 if (x != pixelSideCount - 1) {
                   if (pixels[x + 1][y] == 0) {
                     switchPixels(x + 1, y, x, y);
                   }
                 }
               }
+              //if (pixels[x][y + 1] == 0) {
+              //  switchPixels(x, y + 1, x, y);
+              //}
             }
           } else if (current == 8) {
             // fire stuff
@@ -286,25 +308,25 @@ function tick() {
               let action = rand(1000);
               if (!left) {
                 if (pixels[x - 1][y] == 3) {
-                  setPixel(x, y, 0, true);
+                  setPixel(x, y, 6, true, 1);
                   stillFire = false;
                 }
               }
               if (!right && stillFire) {
                 if (pixels[x + 1][y] == 3) {
-                  setPixel(x, y, 0, true);
+                  setPixel(x, y, 6, true, 1);
                   stillFire = false;
                 }
               }
               if (!top && stillFire) {
                 if (pixels[x][y - 1] == 3) {
-                  setPixel(x, y, 0, true);
+                  setPixel(x, y, 6, true, 1);
                   stillFire = false;
                 }
               }
               if (!bottom && stillFire) {
                 if (pixels[x][y + 1] == 3) {
-                  setPixel(x, y, 0, true);
+                  setPixel(x, y, 6, true, 1);
                   stillFire = false;
                 }
               }
@@ -400,31 +422,66 @@ function fireAction(action, x, y, left, right, bottom, top, fireType) {
         }
       }
     }
-    if (action > 99 && action < 120) {
+    if (action > 99 && action < 115) {
+      //spread
+      if (rand(10) < 4) {
+        //higher chance to spread up
+        if (!top) {
+          if (pixels[x][y - 1] == 0) {
+            setPixel(x, y - 1, 8, true, 1);
+          }
+        }
+      } else {
+        switch (rand(3)) {
+          case 0:
+            if (!left) {
+              if (pixels[x - 1][y] == 0) {
+                setPixel(x - 1, y, 8, true, 1);
+              }
+            }
+            break;
+          case 1:
+            if (!right) {
+              if (pixels[x + 1][y] == 0) {
+                setPixel(x + 1, y, 8, true, 1);
+              }
+            }
+            break;
+          case 2:
+            if (!bottom) {
+              if (pixels[x][y + 1] == 0) {
+                setPixel(x, y + 1, 8, true, 1);
+              }
+            }
+            break;
+        }
+      }
+    } else if (action > 99 && action < 117) {
+      //spread to other logs, very small chance or it's own log will be incinerated
+      if (!top) {
+        if (pixels[x][y - 1] == 6) {
+          setPixel(x, y - 1, 8, true, 0);
+        }
+      }
       if (!left) {
-        if (pixels[x - 1][y] == 0) {
-          setPixel(x - 1, y, 8, true, 1);
+        if (pixels[x - 1][y] == 6) {
+          setPixel(x - 1, y, 8, true, 0);
         }
       }
       if (!right) {
-        if (pixels[x + 1][y] == 0) {
-          setPixel(x + 1, y, 8, true, 1);
-        }
-      }
-      if (!top) {
-        if (pixels[x][y - 1] == 0) {
-          setPixel(x, y - 1, 8, true, 1);
+        if (pixels[x + 1][y] == 6) {
+          setPixel(x + 1, y, 8, true, 0);
         }
       }
       if (!bottom) {
-        if (pixels[x][y + 1] == 0) {
-          setPixel(x, y + 1, 8, true, 1);
+        if (pixels[x][y + 1] == 6) {
+          setPixel(x, y + 1, 8, true, 0);
         }
       }
     }
     if (!nearSource) {
       //burn out
-      if (action < 100) {
+      if (action < 30) {
         setPixel(x, y, 0, true);
       }
     }
@@ -432,7 +489,47 @@ function fireAction(action, x, y, left, right, bottom, top, fireType) {
 }
 
 function setSelected(type) {
+  switch (placeType) {
+    case 0:
+      airBtn.classList.remove("tbSelected");
+      break;
+    case 1:
+      rockBtn.classList.remove("tbSelected");
+      break;
+    case 2:
+      sandBtn.classList.remove("tbSelected");
+      break;
+    case 3:
+      waterBtn.classList.remove("tbSelected");
+      break;
+    case 6:
+      woodBtn.classList.remove("tbSelected");
+      break;
+    case 8:
+      fireBtn.classList.remove("tbSelected");
+      break;
+  }
   placeType = type;
+  switch (placeType) {
+    case 0:
+      airBtn.classList.add("tbSelected");
+      break;
+    case 1:
+      rockBtn.classList.add("tbSelected");
+      break;
+    case 2:
+      sandBtn.classList.add("tbSelected");
+      break;
+    case 3:
+      waterBtn.classList.add("tbSelected");
+      break;
+    case 6:
+      woodBtn.classList.add("tbSelected");
+      break;
+    case 8:
+      fireBtn.classList.add("tbSelected");
+      break;
+  }
 }
 
 document.body.onkeyup = function (e) {
@@ -470,10 +567,19 @@ function setPixel(x, y, set, createNewData, typeData) {
   }
   let origColor = colours[set];
   let col = colours[set];
+
   if (set == 8) {
+    //change color for spreading fire
     if (typeData == 1) {
       origColor = spreadFireCol;
       col = spreadFireCol;
+    }
+  }
+  if (set == 6) {
+    //change color for charred wood
+    if (typeData == 1) {
+      origColor = charredWoodCol;
+      col = charredWoodCol;
     }
   }
 
@@ -585,9 +691,9 @@ function changeBrushSize(amnt) {
     brushSize += amnt;
   }
   document.getElementById("brushSizer").innerHTML =
-    '<st>5 </st>Brush size: <sbt onclick="changeBrushSize(-1)">&lt;</sbt> ' +
+    '<st>5 </st>Brush size: <tb onclick="changeBrushSize(-1)">&lt;</tb> ' +
     brushSize +
-    ' <sbt onclick="changeBrushSize(1)">&gt;</sbt>';
+    ' <tb onclick="changeBrushSize(1)">&gt;</tb>';
   circlePoints = getCircleCoords(brushSize);
 }
 

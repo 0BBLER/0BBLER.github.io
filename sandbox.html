@@ -16,8 +16,8 @@
         <p><st>1 </st>Sandbox Game</p>
         <p><st>2 </st>Inspired by <a href="https://sandspiel.club/">sandspiel.club</a></p>
         <p><st>3 </st></p>
-        <p><st>4 </st><sbt onclick="reset()">|RESET|</sbt> <sbt onclick="setSelected(0)">AIR</sbt> <sbt onclick="setSelected(1)">ROCK</sbt> <sbt onclick="setSelected(2)">SAND</sbt> <sbt onclick="setSelected(3)">WATER</sbt> <sbt onclick="setSelected(6)">WOOD</sbt> <sbt onclick="setSelected(8)">FIRE</sbt></p>
-        <p id="brushSizer"><st>5 </st>Brush size: <sbt onclick="changeBrushSize(-1)">&lt;</sbt> 2 <sbt onclick="changeBrushSize(1)">&gt;</sbt></p>
+        <p><st>4 </st><tb onclick="reset()">|RESET|</tb> <tb id="air" onclick="setSelected(0)">AIR</tb> <tb id="rock" onclick="setSelected(1)">ROCK</tb> <tb id="sand" onclick="setSelected(2)">SAND</tb> <tb id="water" onclick="setSelected(3)">WATER</tb> <tb id="wood" onclick="setSelected(6)">WOOD</tb> <tb id="fire" onclick="setSelected(8)">FIRE</tb></p>
+        <p id="brushSizer"><st>5 </st>Brush size: <tb onclick="changeBrushSize(-1)">&lt;</tb> 2 <tb onclick="changeBrushSize(1)">&gt;</tb></p>
         <p id="pauseBtn" onclick="togglePause()"><st>6 </st>Press space or press this to pause</p>
         <p onclick="homeButton()"><st>7 </st>Back arrow</p>
         <br>

@@ -18,6 +18,10 @@ p {
   user-select: none;
 }
 
+h3 {
+  color: rgb(66, 66, 66);
+}
+
 p:hover {
   background-color: rgba(255, 255, 255, 0.2);
   margin: 0px;
@@ -30,13 +34,18 @@ st {
   color: rgba(216, 216, 216, 0.6);
 }
 
-sbt{ /*sandbox tile*/
+tb {
+  /*text button*/
   background-color: rgba(255, 255, 255, 0.219);
   transition-duration: 300ms;
 }
 
-sbt:hover{
+tb:hover {
   background-color: rgba(255, 255, 255, 0.486);
+}
+
+.tbSelected {
+  background-color: rgba(255, 255, 255, 0.596);
 }
 
 .topbar {
@@ -63,4 +72,38 @@ sbt:hover{
 .pagelink {
   color: rgb(10, 94, 173);
   text-decoration-line: underline;
+}
+
+.element_win {
+  position: absolute;
+  width: 500px;
+  height: 300px;
+  background-color: rgb(216, 216, 216);
+  border: 5px double rgb(82, 82, 82);
+  color: rgb(0, 105, 9);
+  border-radius: 20px;
+  left: -700px;
+  top: 340px;
+  text-align: center;
+  font-size: 40px;
+  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
+  transition-duration: 1s;
+}
+
+.element_win_show {
+  left: 30%;
+  box-shadow: 0px 0px 3px 20px rgba(0, 0, 0, 0.267);
+}
+
+#elementIn {
+  border: none;
+  background-color: rgb(66, 66, 66);
+  color: rgb(216, 216, 216);
+  outline: none;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+#elementIn:focus {
+  box-shadow: 0px 0px 2px 2px rgba(168, 168, 168, 0.466);
+  caret-color: transparent;
 }
