@@ -1,4 +1,6 @@
 var table = document.getElementById("table");
+var gameSwitcher = document.getElementById("gameSwitcher");
+var gameRules = document.getElementById("htp");
 const elementSize = 70;
 const elementMargin = 4;
 const skip = elementMargin + elementSize;
@@ -9,13 +11,257 @@ var showNumbers = false;
 var showAbbreviations = false;
 var shownCharacters = 0;
 var revealAnswer = 0;
+var gameType = 0; //GAMETYPE: 0:secretElement, 1:timed
+var firstElement = false;
+var timer = 0;
+var timerAccuracy = 10;
+var timerEstimate = 0;
+var timerActive = false;
+
 table.width = 18 * elementSize + 18 * elementMargin;
 table.height = 9 * elementSize + 18 * elementMargin + elementSize / 8; // add that extra margin because of the space between the lanthanides and main area
 
-const elements=[["HYDROGEN"],["HELIUM"],["LITHIUM"],["BERYLLIUM"],["BORON"],["CARBON"],["NITROGEN"],["OXYGEN"],["FLUORINE"],["NEON"],["SODIUM"],["MAGNESIUM"],["ALUMINUM","ALUMINIUM"],["SILICON"],["PHOSPHORUS"],["SULFUR","SULPHUR"],["CHLORINE"],["ARGON"],["POTASSIUM"],["CALCIUM"],["SCANDIUM"],["TITANIUM"],["VANADIUM"],["CHROMIUM"],["MANGANESE"],["IRON"],["COBALT"],["NICKEL"],["COPPER"],["ZINC"],["GALLIUM"],["GERMANIUM"],["ARSENIC"],["SELENIUM"],["BROMINE"],["KRYPTON"],["RUBIDIUM"],["STRONTIUM"],["YTTRIUM"],["ZIRCONIUM"],["NIOBIUM"],["MOLYBDENUM"],["TECHNETIUM"],["RUTHENIUM"],["RHODIUM"],["PALLADIUM"],["SILVER"],["CADMIUM"],["INDIUM"],["TIN"],["ANTIMONY"],["TELLURIUM"],["IODINE"],["XENON"],["CESIUM","CAESIUM"],["BARIUM"],["LANTHANUM"],["CERIUM"],["PRASEODYMIUM"],["NEODYMIUM"],["PROMETHIUM"],["SAMARIUM"],["EUROPIUM"],["GADOLINIUM"],["TERBIUM"],["DYSPROSIUM"],["HOLMIUM"],["ERBIUM"],["THULIUM"],["YTTERBIUM"],["LUTETIUM"],["HAFNIUM"],["TANTALUM"],["TUNGSTEN"],["RHENIUM"],["OSMIUM"],["IRIDIUM"],["PLATINUM"],["GOLD"],["MERCURY"],["THALLIUM"],["LEAD"],["BISMUTH"],["POLONIUM"],["ASTATINE"],["RADON"],["FRANCIUM"],["RADIUM"],["ACTINIUM"],["THORIUM"],["PROTACTINIUM"],["URANIUM"],["NEPTUNIUM"],["PLUTONIUM"],["AMERICIUM"],["CURIUM"],["BERKELIUM"],["CALIFORNIUM"],["EINSTEINIUM"],["FERMIUM"],["MENDELEVIUM"],["NOBELIUM"],["LAWRENCIUM"],["RUTHERFORDIUM"],["DUBNIUM"],["SEABORGIUM"],["BOHRIUM"],["HASSIUM"],["MEITNERIUM"],["DARMSTADTIUM"],["ROENTGENIUM"],["COPERNICIUM"],["NIHONIUM"],["FLEROVIUM"],["MOSCOVIUM"],["LIVERMORIUM"],["TENNESSINE"],["OGANESSON"]];
+const elements = [
+  ["HYDROGEN"],
+  ["HELIUM"],
+  ["LITHIUM"],
+  ["BERYLLIUM"],
+  ["BORON"],
+  ["CARBON"],
+  ["NITROGEN"],
+  ["OXYGEN"],
+  ["FLUORINE"],
+  ["NEON"],
+  ["SODIUM"],
+  ["MAGNESIUM"],
+  ["ALUMINUM", "ALUMINIUM"],
+  ["SILICON"],
+  ["PHOSPHORUS"],
+  ["SULFUR", "SULPHUR"],
+  ["CHLORINE"],
+  ["ARGON"],
+  ["POTASSIUM"],
+  ["CALCIUM"],
+  ["SCANDIUM"],
+  ["TITANIUM"],
+  ["VANADIUM"],
+  ["CHROMIUM"],
+  ["MANGANESE"],
+  ["IRON"],
+  ["COBALT"],
+  ["NICKEL"],
+  ["COPPER"],
+  ["ZINC"],
+  ["GALLIUM"],
+  ["GERMANIUM"],
+  ["ARSENIC"],
+  ["SELENIUM"],
+  ["BROMINE"],
+  ["KRYPTON"],
+  ["RUBIDIUM"],
+  ["STRONTIUM"],
+  ["YTTRIUM"],
+  ["ZIRCONIUM"],
+  ["NIOBIUM"],
+  ["MOLYBDENUM"],
+  ["TECHNETIUM"],
+  ["RUTHENIUM"],
+  ["RHODIUM"],
+  ["PALLADIUM"],
+  ["SILVER"],
+  ["CADMIUM"],
+  ["INDIUM"],
+  ["TIN"],
+  ["ANTIMONY"],
+  ["TELLURIUM"],
+  ["IODINE"],
+  ["XENON"],
+  ["CESIUM", "CAESIUM"],
+  ["BARIUM"],
+  ["LANTHANUM"],
+  ["CERIUM"],
+  ["PRASEODYMIUM"],
+  ["NEODYMIUM"],
+  ["PROMETHIUM"],
+  ["SAMARIUM"],
+  ["EUROPIUM"],
+  ["GADOLINIUM"],
+  ["TERBIUM"],
+  ["DYSPROSIUM"],
+  ["HOLMIUM"],
+  ["ERBIUM"],
+  ["THULIUM"],
+  ["YTTERBIUM"],
+  ["LUTETIUM"],
+  ["HAFNIUM"],
+  ["TANTALUM"],
+  ["TUNGSTEN"],
+  ["RHENIUM"],
+  ["OSMIUM"],
+  ["IRIDIUM"],
+  ["PLATINUM"],
+  ["GOLD"],
+  ["MERCURY"],
+  ["THALLIUM"],
+  ["LEAD"],
+  ["BISMUTH"],
+  ["POLONIUM"],
+  ["ASTATINE"],
+  ["RADON"],
+  ["FRANCIUM"],
+  ["RADIUM"],
+  ["ACTINIUM"],
+  ["THORIUM"],
+  ["PROTACTINIUM"],
+  ["URANIUM"],
+  ["NEPTUNIUM"],
+  ["PLUTONIUM"],
+  ["AMERICIUM"],
+  ["CURIUM"],
+  ["BERKELIUM"],
+  ["CALIFORNIUM"],
+  ["EINSTEINIUM"],
+  ["FERMIUM"],
+  ["MENDELEVIUM"],
+  ["NOBELIUM"],
+  ["LAWRENCIUM"],
+  ["RUTHERFORDIUM"],
+  ["DUBNIUM"],
+  ["SEABORGIUM"],
+  ["BOHRIUM"],
+  ["HASSIUM"],
+  ["MEITNERIUM"],
+  ["DARMSTADTIUM"],
+  ["ROENTGENIUM"],
+  ["COPERNICIUM"],
+  ["NIHONIUM"],
+  ["FLEROVIUM"],
+  ["MOSCOVIUM"],
+  ["LIVERMORIUM"],
+  ["TENNESSINE"],
+  ["OGANESSON"],
+];
 
-const abbreviations=["H","He","Li","Be","B","C","N","O","F","Ne","Na","Mg","Al","Si","P","S","Cl","Ar","K","Ca","Sc","Ti","V","Cr","Mn","Fe","Co","Ni","Cu","Zn","Ga","Ge","As","Se","Br","Kr","Rb","Sr","Y","Zr","Nb","Mo","Tc","Ru","Rh","Pd","Ag","Cd","In","Sn","Sb","Te","I","Xe","Cs","Ba","La","Ce","Pr","Nd","Pm","Sm","Eu","Gd","Tb","Dy","Ho","Er","Tm","Yb","Lu","Hf","Ta","W","Re","Os","Ir","Pt","Au","Hg","Tl","Pb","Bi","Po","At","Rn","Fr","Ra","Ac","Th","Pa","U","Np","Pu","Am","Cm","Bk","Cf","Es","Fm","Md","No","Lr","Rf","Db","Sg","Bh","Hs","Mt","Ds","Rg","Cn","Nh","Fl","Mc","Lv","Ts","Og",];
-
+const abbreviations = [
+  "H",
+  "He",
+  "Li",
+  "Be",
+  "B",
+  "C",
+  "N",
+  "O",
+  "F",
+  "Ne",
+  "Na",
+  "Mg",
+  "Al",
+  "Si",
+  "P",
+  "S",
+  "Cl",
+  "Ar",
+  "K",
+  "Ca",
+  "Sc",
+  "Ti",
+  "V",
+  "Cr",
+  "Mn",
+  "Fe",
+  "Co",
+  "Ni",
+  "Cu",
+  "Zn",
+  "Ga",
+  "Ge",
+  "As",
+  "Se",
+  "Br",
+  "Kr",
+  "Rb",
+  "Sr",
+  "Y",
+  "Zr",
+  "Nb",
+  "Mo",
+  "Tc",
+  "Ru",
+  "Rh",
+  "Pd",
+  "Ag",
+  "Cd",
+  "In",
+  "Sn",
+  "Sb",
+  "Te",
+  "I",
+  "Xe",
+  "Cs",
+  "Ba",
+  "La",
+  "Ce",
+  "Pr",
+  "Nd",
+  "Pm",
+  "Sm",
+  "Eu",
+  "Gd",
+  "Tb",
+  "Dy",
+  "Ho",
+  "Er",
+  "Tm",
+  "Yb",
+  "Lu",
+  "Hf",
+  "Ta",
+  "W",
+  "Re",
+  "Os",
+  "Ir",
+  "Pt",
+  "Au",
+  "Hg",
+  "Tl",
+  "Pb",
+  "Bi",
+  "Po",
+  "At",
+  "Rn",
+  "Fr",
+  "Ra",
+  "Ac",
+  "Th",
+  "Pa",
+  "U",
+  "Np",
+  "Pu",
+  "Am",
+  "Cm",
+  "Bk",
+  "Cf",
+  "Es",
+  "Fm",
+  "Md",
+  "No",
+  "Lr",
+  "Rf",
+  "Db",
+  "Sg",
+  "Bh",
+  "Hs",
+  "Mt",
+  "Ds",
+  "Rg",
+  "Cn",
+  "Nh",
+  "Fl",
+  "Mc",
+  "Lv",
+  "Ts",
+  "Og",
+];
 
 var elementData = new Array(0);
 var added = false;
@@ -133,9 +379,15 @@ function drawTable() {
     g.lineWidth = 1;
     drawElement(m, elementData[m].x, elementData[m].y);
   }
-  g.strokeStyle = "rgb(220, 220, 220)";
-  g.font = "small-caps 85px Courier New";
-  g.strokeText("Guesses: " + guesses, skip * 4, skip * 1.6);
+  if (gameType == 0) {
+    g.strokeStyle = "rgb(220, 220, 220)";
+    g.font = "small-caps 85px Courier New";
+    g.strokeText("Guesses: " + guesses, skip * 4, skip * 1.6);
+  } else {
+    g.strokeStyle = "rgb(220, 220, 220)";
+    g.font = "small-caps 85px Courier New";
+    g.strokeText("Time: " + timer / 1000.0 + "s", skip * 4, skip * 1.6);
+  }
   g.lineWidth = 3;
   g.strokeStyle = "rgb(220, 220, 220, 0.3)";
   g.moveTo(lines[0], lines[1]);
@@ -155,7 +407,7 @@ function drawElement(id, x, y) {
   //id is the number in the array that is currently being drawn
   g.strokeRect(x, y, elementSize, elementSize);
 
-  if (revealedElements[id] == true || revealAnswer == 2) {
+  if ((revealedElements[id] == true || revealAnswer == 2) && gameType == 0) {
     if (id < 119 && id > -1) {
       g.fillStyle =
         "rgb(" +
@@ -173,7 +425,9 @@ function drawElement(id, x, y) {
 
       g.fillRect(x, y, elementSize, elementSize);
       g.strokeStyle = "rgb(30, 30, 30)";
+      g.font = "small-caps 10px Courier New";
       g.strokeText(elements[elementData[id].id - 1][0], x + 2, y + 20);
+      g.font = "small-caps 12px Courier New";
       g.strokeText(elementData[id].id, x + 2, y + 10);
       g.font = "small-caps 30px Courier New";
       g.strokeStyle = "rgb(255, 255, 255, 0.6)";
@@ -181,9 +435,11 @@ function drawElement(id, x, y) {
     }
   } else {
     if (showNumbers) {
+      g.font = "small-caps 12px Courier New";
       g.strokeText(elementData[id].id, x + 2, y + 10);
     }
     if (shownCharacters > 0) {
+      g.font = "small-caps 12px Courier New";
       g.strokeText(
         elements[elementData[id].id - 1][0].slice(0, shownCharacters),
         x + 2,
@@ -196,10 +452,25 @@ function drawElement(id, x, y) {
       g.strokeText(abbreviations[elementData[id].id - 1], x + 20, y + 45);
     }
   }
-  if (elementData[id].id - 1 == SECRET_ELEMENT && revealAnswer > 0) {
+  if (
+    elementData[id].id - 1 == SECRET_ELEMENT &&
+    revealAnswer > 0 &&
+    gameType == 0
+  ) {
     g.lineWidth = 3;
     g.strokeStyle = "rgb(255, 255, 255)";
     g.strokeRect(x, y, elementSize, elementSize);
+  }
+  if (gameType == 1 && (revealedElements[id] == true || revealAnswer == true)) {
+    g.fillStyle = "Lime";
+    g.fillRect(x, y, elementSize, elementSize);
+    g.strokeStyle = "rgb(30, 30, 30)";
+    g.font = "small-caps 10px Courier New";
+    g.strokeText(elements[elementData[id].id - 1][0], x + 2, y + 20);
+    g.strokeText(elementData[id].id, x + 2, y + 10);
+    g.font = "small-caps 30px Courier New";
+    g.strokeStyle = "rgb(0, 0, 0, 0.6)";
+    g.strokeText(abbreviations[elementData[id].id - 1], x + 20, y + 45);
   }
 }
 
@@ -212,8 +483,20 @@ input.addEventListener("keyup", function () {
         revealedElements[tryElement] = true;
         guesses++;
         drawTable();
-        if (k == SECRET_ELEMENT) {
+        if (k == SECRET_ELEMENT && gameType == 0) {
           win();
+        }
+        if (gameType == 1 && firstElement) {
+          firstElement = false;
+          startTimer();
+        }
+        if (
+          gameType == 1 &&
+          revealAnswer == 0 &&
+          !revealedElements.includes(undefined)
+        ) {
+          win();
+          stopTimer();
         }
       }
       input.value = "";
@@ -245,8 +528,11 @@ function getElementIn(element) {
 function resetGame() {
   revealAnswer = 0;
   guesses = 0;
+  firstElement = true;
   document.getElementById("element_win").classList.remove("element_win_show");
   revealedElements = new Array(118);
+  timerActive = false;
+  timer = 0;
 
   SECRET_ELEMENT = rand(118);
 
@@ -255,7 +541,12 @@ function resetGame() {
 
 function win() {
   if (revealAnswer < 2) {
-    document.getElementById("popupGuesses").innerHTML = "Guesses: " + guesses;
+    if (gameType == 1) {
+      document.getElementById("score").innerHTML =
+        "Time: " + timer / 1000.0 + "s";
+    } else {
+      document.getElementById("score").innerHTML = "Guesses: " + guesses;
+    }
     document.getElementById("element_win").classList.add("element_win_show");
   }
 }
@@ -268,8 +559,12 @@ function rand(max) {
 }
 
 function reveal() {
-  if (revealAnswer < 2) {
-    revealAnswer += 1;
+  if (gameType == 0) {
+    if (revealAnswer < 2) {
+      revealAnswer += 1;
+    }
+  } else {
+    revealAnswer = 1;
   }
   drawTable();
 }
@@ -303,4 +598,40 @@ function toggleAbbreviations() {
     document.getElementById("abbT").classList.remove("tbSelected");
   }
   drawTable();
+}
+
+function switchGame() {
+  if (gameType == 0) {
+    gameType = 1;
+    gameSwitcher.innerHTML = "Mode: Timed full periodic table";
+    gameRules.innerHTML = "<st>7 </st>Try to fill in the periodic table in the least amount of time! Also there's some buttons above to help."
+    resetGame();
+  } else {
+    gameType = 0;
+    gameSwitcher.innerHTML = "Mode: Secret Element";
+    gameRules.innerHTML = "<st>7 </st>A secret element is chosen and you have to guess what it is in a sort of hot/cold style. Type an element into the box below:"
+    resetGame();
+  }
+}
+
+function startTimer() {
+  timerActive = true;
+  timer = 0;
+  timerEstimate = Date.now() + timerAccuracy;
+  timerTick();
+}
+
+function stopTimer() {
+  timerActive = false;
+}
+
+function timerTick() {
+  if (timerActive) {
+    var timerShift = Date.now() - timerEstimate;
+    timer += timerAccuracy;
+
+    timerEstimate += timerAccuracy;
+    drawTable();
+    setTimeout(timerTick, Math.max(0, timerAccuracy - timerShift));
+  }
 }
