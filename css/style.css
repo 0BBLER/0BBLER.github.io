@@ -78,7 +78,7 @@ tb:hover {
   position: absolute;
   width: 500px;
   height: 300px;
-  background-color: rgb(216, 216, 216);
+  background-color: rgb(216, 216, 216, 0.8);
   border: 5px double rgb(82, 82, 82);
   color: rgb(0, 105, 9);
   border-radius: 20px;
