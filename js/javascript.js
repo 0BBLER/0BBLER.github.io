@@ -24,5 +24,5 @@ function c8() {
 function c9() {
   open("https://0bbler.github.io/element", "_self");
 }
-function c10() {open("https://0bbler.github.io/clickspeed", "_self");}
-function c11() {}
+function c10() {open("https://0bbler.github.io/fish", "_self");}
+function c11() {open("https://0bbler.github.io/clickspeed", "_self");}
