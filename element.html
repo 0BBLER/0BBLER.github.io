@@ -7,10 +7,10 @@
         <link rel="icon" type="image/x-icon" href="favicon.ico">
         <title>0BBLER.github.io</title>
     </head>
-    <body style="overflow-x: hidden;">
+    <body style="overflow-x: hidden; overflow-y: hidden;">
         
         <div>
-        <input disabled placeholder="0BBLER.github.io" class="topbar" value="0BBLER.github.io/element"></input>
+        <input disabled placeholder="0BBLER.github.io" class="topbar" value="0BBLER.github.io/element">
         </div>
 
         &nbsp;
@@ -21,12 +21,11 @@
         <p><st>4 </st><tb onclick="toggleNumbers()" id="numT">Toggle numbers</tb> <tb id="abbT" onclick="toggleAbbreviations()">Toggle abbreviations</tb> <tb id="charT" onclick="toggleCharacters()">Cycle shown characters</tb> <tb onclick="reveal()">REVEAL ANSWER</tb> &#8592 Some fun buttons to help</p>
         <p><st>6 </st>How to Play:</p>
         <p id="htp"><st>7 </st>A secret element is chosen and you have to guess what it is in a sort of hot/cold style. Type an element into the box below:</p>
-        <p><st>8 </st><input autofocus onblur="this.focus()" spellcheck="false" id="elementIn" size="50"></input></p>
-        <br>
+        <p><st>8 </st><input autofocus onblur="this.focus()" spellcheck="false" id="elementIn" size="50"></p>
+        
         <canvas class="periodicTable" id="table"></canvas>
-        <br>
-        <br>
-        <p id="backButton" onclick="homeButton()" style="position:absolute;"><st>9 </st>Back arrow</p>
+        
+        <p id="backButton" onclick="homeButton()" style="position:absolute; bottom:10px; width:100%"><st>9 </st>Back arrow</p>
 
         <div onclick="closeWin()" id="element_win" class="element_win"><h1 style="background-color: transparent;">VICTORY!</h1><h3 id="score" style="top:340px">Guesses: </h3></div>
 

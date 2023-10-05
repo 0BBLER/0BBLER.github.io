@@ -687,7 +687,6 @@ function setElementSize(size) {
   skip = elementMargin + elementSize;
   elementRatio = elementSize / 70;
   initializeTable();
-  document.getElementById("backButton").style.top =
-    9 * elementSize + 9 * elementMargin + elementSize / 8 + 240 + "px";
+  //document.getElementById("backButton").style.top = 9 * elementSize + 9 * elementMargin + elementSize / 8 + 240 + "px";
   drawTable();
 }
