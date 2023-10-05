@@ -683,6 +683,12 @@ window.addEventListener("mousedown", () => {
 window.addEventListener("mouseup", () => {
   mousedown = false;
 });
+window.addEventListener("touchstart", () => {
+  mousedown = true;
+});
+window.addEventListener("touchend", () => {
+  mousedown = false;
+});
 
 function changeBrushSize(amnt) {
   if (brushSize + changeBrushSize < 1) {
