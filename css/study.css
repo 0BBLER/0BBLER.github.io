@@ -1,0 +1,242 @@
+body {
+  background-color: rgb(200, 200, 200);
+  margin-top: 0px;
+}
+
+nav {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 30px;
+  background-color: rgb(240, 240, 240);
+  padding: 5px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+
+  z-index: 999;
+}
+
+textarea {
+  resize: none;
+}
+
+button {
+  background-color: rgb(210, 210, 210);
+  border: 1px solid rgb(200, 200, 200);
+  transition-duration: 600ms;
+}
+
+button:hover {
+  background-color: rgb(180, 180, 180);
+}
+
+tr {
+  word-wrap: break-word;
+}
+
+tr:nth-child(odd) {
+  background-color: rgba(0, 21, 255, 0.041);
+}
+
+td {
+  border: 1px solid rgb(200, 200, 200);
+  word-wrap: break-word;
+}
+
+td:first-child {
+  width: 33%;
+}
+
+.editorPane {
+  position: absolute;
+  top: 45px;
+}
+
+.editorCard {
+  position: absolute;
+  width: 250px;
+  height: 350px;
+  background-color: rgb(240, 240, 240);
+  border: 1px solid rgb(200, 200, 200);
+  border-radius: 20px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  transition-duration: 300ms;
+  margin: 4px;
+  text-align: center;
+  padding: 6px;
+}
+
+.delBtn {
+  position: absolute;
+  cursor: pointer;
+  opacity: 0.5;
+  transition-duration: 300ms;
+}
+
+.delBtn:hover {
+  opacity: 1;
+}
+
+.editorCard:hover,
+.coolBtn:hover {
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+}
+
+.bigCard {
+  position: absolute;
+  top: 50px;
+  height: 400px;
+  background-color: rgb(240, 240, 240);
+  border: 1px solid rgb(200, 200, 200);
+  border-radius: 20px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  transition-duration: 300ms;
+  margin: 4px;
+  text-align: center;
+  padding: 16px;
+}
+
+.editorQuestion {
+  border: none;
+  background-color: transparent;
+  height: 20%;
+  text-align: center;
+  font-weight: bold;
+  font-size: 1.3em;
+}
+
+.editorQuestion:focus,
+.editorAnswer:focus {
+  outline: 1px dotted rgba(0, 0, 0, 0.2);
+  border: none;
+}
+
+.select {
+  width: 70%;
+  background-color: rgb(230, 230, 230);
+  outline: 1px dotted rgba(0, 0, 0, 0.2);
+  border: none;
+  border-radius: 10%;
+  padding: 2px;
+  margin-bottom: 5px;
+}
+
+.select:focus {
+  outline: 1px dotted rgba(0, 0, 0, 0.2);
+  border: none;
+}
+
+.select * {
+  background-color: rgb(200, 200, 250);
+}
+
+.editorAnswer {
+  border: none;
+  background-color: transparent;
+  height: 54%;
+}
+
+.coolBtn {
+  cursor: pointer;
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background-color: rgb(240, 240, 240);
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  margin: 4px;
+  vertical-align: middle;
+  transition-duration: 300ms;
+  text-align: center;
+  font-size: 25px;
+}
+
+.bigCardTitle {
+  font-size: 40px;
+  font-weight: bold;
+  margin: 8px;
+}
+
+.bigCardBody {
+  font-size: 21px;
+}
+
+.bigTextarea {
+  outline: 1px dotted rgba(0, 0, 0, 0.2);
+  border: none;
+  font-size: 20px;
+  width: 100%;
+  height: 50%;
+}
+
+.bigCardIndex {
+  font-size: 40px;
+  font-weight: bold;
+  position: absolute;
+  color: rgb(180, 180, 180);
+  top: -20px;
+  left: 20px;
+}
+
+.answerTable {
+  border: 3px solid rgb(200, 200, 200);
+  line-height: normal;
+  width: 100%;
+  font-size: 18px;
+  word-wrap: break-word;
+  table-layout: fixed;
+}
+
+.multipleChoiceContainer {
+  vertical-align: middle;
+  margin: 0px;
+  cursor: pointer;
+  z-index: 999;
+}
+
+.multipleChoiceCheckbox {
+  appearance: none;
+  background-color: #fff;
+  margin: 8px;
+  width: 2em;
+  height: 2em;
+  border: 1px solid black;
+  border-radius: 0.15em;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.multipleChoiceContainer:hover .multipleChoiceCheckbox {
+  outline: 1px solid rgb(144, 175, 204);
+}
+
+.multipleChoiceCheckbox:checked {
+  background-color: rgb(144, 175, 204);
+}
+
+.multipleChoiceWords {
+  display: inline-block;
+  font-size: 22px;
+  line-height: 5px;
+  transform: translateY(-15px);
+}
+
+.popup {
+  width: fit-content;
+  height: fit-content;
+  position: fixed;
+  top: 20px;
+  z-index: 9999;
+  background-color: rgb(240, 240, 240);
+  border-radius: 20px;
+  box-shadow: 0px 0px 25px rgba(0, 0, 0, 0.4);
+  transition: 500ms ease-in-out;
+  margin: 4px;
+  text-align: center;
+  padding: 10px;
+}
+
+::placeholder {
+  color: black;
+  opacity: 0.5;
+}
