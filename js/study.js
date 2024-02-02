@@ -232,6 +232,7 @@ function arrayEquals(arr1, arr2) {
 }
 
 function setupTest() {
+  resultsButton.style.opacity = 1;
   testQuestions = [];
 
   questionIdx = 0;
