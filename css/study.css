@@ -258,6 +258,31 @@ td:first-child {
   padding: 10px;
 }
 
+.infoBtn {
+  position: fixed;
+  left: 10px;
+  bottom: 10px;
+  font-size: 20px;
+  border: 1px solid rgba(0, 0, 0, 0.171);
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  font-weight: bolder;
+  transition-duration: 400ms;
+  opacity: 0.5;
+  cursor: pointer;
+}
+
+.infoBtn p {
+  position: fixed;
+  left: 24px;
+  bottom: -6px;
+}
+
+.infoBtn:hover {
+  opacity: 1;
+}
+
 ::placeholder {
   color: black;
   opacity: 0.5;

@@ -8,6 +8,7 @@ var editorPane = document.getElementById("questionEditor");
 var modeBtn = document.getElementById("modeButton");
 var resultsButton = document.getElementById("resultsButton");
 var popup = document.getElementById("popup");
+var infoBtn = document.getElementById("infoBtn");
 var testQuestions = [];
 var onScreenCheckboxes = [];
 var shuffledAnswerKey = [];
@@ -29,6 +30,8 @@ window.addEventListener("keydown", (e) => {
 
 popup.style.left = "-400px";
 popup.style.opacity = "1";
+modeBtn.innerHTML = "Test me";
+resultsButton.style.opacity = 0;
 
 document.body.addEventListener("keydown", (e) => {
   if (!isTestMode) return;
@@ -53,8 +56,30 @@ document.body.addEventListener("keydown", (e) => {
   }
 });
 
-modeBtn.innerHTML = "Test me";
-resultsButton.style.opacity = 0;
+infoBtn.addEventListener("click", () => {
+  popup.innerHTML = "";
+  let title = document.createElement("p");
+  title.innerHTML = "Info";
+  title.style.fontSize = "30px";
+  title.style.fontWeight = "bold";
+  let someText = document.createElement("p");
+  someText.innerHTML = "Create/delete questions using the obvious buttons<br>";
+  someText.innerHTML += "Right click multiple choice options to mark them as correct<br>";
+  someText.innerHTML += "Sort your questions into categories if you want<br>";
+  someText.innerHTML += 'Press the "test me" button when you are ready<br><br>';
+  someText.innerHTML += "DURING TEST MODE:<br>";
+  someText.innerHTML += "Press left/right arrow keys to move between cards<br>";
+  someText.innerHTML += "Press up/down arrow keys to compare you answer<br>";
+  someText.innerHTML += "The enter key is best though, as it moves on once the answer is revealed<br>";
+  someText.innerHTML += 'Also, the "view results" button will let you view your results<br><br>';
+  someText.innerHTML += "Press Esc to close";
+  someText.style.fontSize = "15px";
+
+  popup.append(title);
+  popup.append(someText);
+
+  createPopup();
+});
 
 function toggleTest() {
   resultsButton.style.opacity = 0;
@@ -130,6 +155,8 @@ function getTestCategories() {
   goBtn = document.createElement("btn");
   goBtn.classList.add("coolBtn");
   goBtn.innerHTML = "<br>Go!";
+  goBtn.style.fontWeight = "bold";
+  goBtn.style.lineHeight = "26px";
   goBtn.style.position = "absolute";
   goBtn.style.bottom = "20px";
   goBtn.style.right = "60px";
@@ -596,6 +623,7 @@ function genQuestions() {
       });
 
       categorySelector.addEventListener("change", () => {
+        categorySelector.blur();
         if (categorySelector.value == "Create new") {
           popup.innerHTML = "";
           categorySelector.value = selectedCategoryPrevVal;
@@ -694,12 +722,17 @@ function genQuestions() {
   }
   createButton = document.createElement("div");
   createButton.classList.add("coolBtn");
-  if (cardAmntPerRow - Math.floor(cardAmntPerRow) > 0.4 && questionElements.length % Math.floor(cardAmntPerRow) == 0) {
-    createButton.style.left = (((questionElements.length - 1) % Math.floor(cardAmntPerRow)) + 1) * 270 + 10 + "px";
-    createButton.style.top = 370 * Math.floor((questionElements.length - 1) / Math.floor(cardAmntPerRow)) + 145 + "px";
+  if (questionElements.length > 0) {
+    if (cardAmntPerRow - Math.floor(cardAmntPerRow) > 0.4 && questionElements.length % Math.floor(cardAmntPerRow) == 0) {
+      createButton.style.left = (((questionElements.length - 1) % Math.floor(cardAmntPerRow)) + 1) * 270 + 10 + "px";
+      createButton.style.top = 370 * Math.floor((questionElements.length - 1) / Math.floor(cardAmntPerRow)) + 145 + "px";
+    } else {
+      createButton.style.left = (questionElements.length % Math.floor(cardAmntPerRow)) * 270 + 10 + "px";
+      createButton.style.top = 370 * Math.floor(questionElements.length / Math.floor(cardAmntPerRow)) + 145 + "px";
+    }
   } else {
-    createButton.style.left = (questionElements.length % Math.floor(cardAmntPerRow)) * 270 + 10 + "px";
-    createButton.style.top = 370 * Math.floor(questionElements.length / Math.floor(cardAmntPerRow)) + 145 + "px";
+    createButton.style.left = "10px";
+    createButton.style.top = "145px";
   }
 
   createButton.addEventListener("click", function () {
@@ -865,7 +898,7 @@ const downloadFile = (contents, name) => {
   link.click();
   URL.revokeObjectURL(link.href);
 };
-/*
+
 createQuestion(
   "What is 4+5?",
   "choice",
@@ -876,7 +909,7 @@ createQuestion(
   },
   "math"
 );
-*/
+
 createQuestion(
   "What is the first element in the periodic table?",
   "choice",
@@ -887,7 +920,7 @@ createQuestion(
   },
   "science"
 );
-//createQuestion("Which continent is Canada in?", "text", "North America", {}, "geography");
+createQuestion("Which continent is Canada in?", "text", "North America", {}, "geography");
 
 /*
 createQuestion("What is 1+1?", "text", "2");
