@@ -1,9 +1,9 @@
 var questions = [];
 var questionElements = [];
-var categories = ["category"];
-var selectedCategories = [true];
+var categories = ["category", "math", "geography", "science"];
+var selectedCategories = [true, true, true, true];
 var givenAnswers = [];
-var selectedNameCategories = ["category"];
+var selectedNameCategories = ["category", "math", "geography", "science"];
 var editorPane = document.getElementById("questionEditor");
 var modeBtn = document.getElementById("modeButton");
 var resultsButton = document.getElementById("resultsButton");
@@ -15,6 +15,7 @@ var questionIdx = 0;
 var isTestMode = false;
 var askingQuestion = false;
 var ansRevealed = false;
+var resultsRevealed = false;
 var currentCard;
 var goBtn;
 var cardAmntPerRow, createButton;
@@ -32,14 +33,14 @@ popup.style.opacity = "1";
 document.body.addEventListener("keydown", (e) => {
   if (!isTestMode) return;
 
-  if (e.key == "ArrowRight") {
+  if (e.key == "ArrowRight" && !resultsRevealed) {
     nextQuestion();
   }
   if (e.key == "ArrowLeft") {
     prevQuestion();
   }
 
-  if (e.key == "ArrowUp" || e.key == "ArrowDown" || e.key == "Enter") {
+  if ((e.key == "ArrowUp" || e.key == "ArrowDown" || e.key == "Enter") && !resultsRevealed) {
     if (e.key == "Enter" && ansRevealed) {
       nextQuestion();
     }
@@ -161,6 +162,8 @@ function getTestCategories() {
 function viewResults() {
   if (!isTestMode) return;
   if (!currentCard == undefined) givenAnswers[questionIdx] = currentCard.children[2].value;
+  resultsRevealed = true;
+  resultsButton.style.opacity = 0;
   currentCard.remove();
   currentCard = document.createElement("div");
   currentCard.classList.add("bigCard");
@@ -200,9 +203,11 @@ function viewResults() {
       given.innerHTML = givenAnswers[i];
     } else if (testQuestions[i].type == "choice") {
       let givenAsText = [];
-      givenAnswers[i].map((x, i2) => {
-        if (x) givenAsText.push(questions[i].choice.options[i2]);
-      });
+      if (givenAnswers[i] != "") {
+        givenAnswers[i].map((x, i2) => {
+          if (x) givenAsText.push(testQuestions[i].choice.options[i2]);
+        });
+      }
       given.innerHTML = givenAsText.toString();
     }
     t.append(given);
@@ -237,9 +242,13 @@ function setupTest() {
 
   questionIdx = 0;
 
+  const duplicatedQuestions = JSON.parse(JSON.stringify(questions));
   for (let i = 0; i < questions.length; i++) {
     if (selectedNameCategories.includes(questions[i].category)) {
-      testQuestions.push(questions[i]);
+      testQuestions.push(duplicatedQuestions[i]);
+      if (testQuestions.type == "choice") {
+        testQuestions[i].choice.options = testQuestions[i].choice.options.removeUndefined();
+      }
     }
   }
 
@@ -267,6 +276,8 @@ function nextQuestion() {
 
 function prevQuestion() {
   if (!isTestMode || !askingQuestion) return;
+  resultsRevealed = false;
+  resultsButton.style.opacity = 1;
   if (questionIdx > 0) {
     questionIdx--;
   }
@@ -278,11 +289,29 @@ function revealAns() {
   currentCard.children[1].remove();
   currentCard.children[1].remove();
   let reveal = document.createElement("div");
-  let given = givenAnswers[questionIdx];
   reveal.append(createBigCardBody("Your answer:"));
-  reveal.append(createBigCardBody(givenAnswers[questionIdx]));
+  if (testQuestions[questionIdx].type == "text") {
+    reveal.append(createBigCardBody(givenAnswers[questionIdx]));
+  } else if (testQuestions[questionIdx].type == "choice") {
+    let givenAsText = [];
+    if (givenAnswers[questionIdx] != "") {
+      givenAnswers[questionIdx].map((x, i2) => {
+        if (x) givenAsText.push(testQuestions[questionIdx].choice.options[i2]);
+      });
+    }
+    reveal.append(createBigCardBody(givenAsText.toString()));
+  }
   reveal.append(createBigCardBody("\nAnswer:"));
-  reveal.append(createBigCardBody(testQuestions[questionIdx].answer));
+  if (testQuestions[questionIdx].type == "text") {
+    reveal.append(createBigCardBody(testQuestions[questionIdx].answer));
+  } else if (testQuestions[questionIdx].type == "choice") {
+    let ansAsText = [];
+    questions[questionIdx].choice.correct.map((x, i2) => {
+      if (x) ansAsText.push(questions[questionIdx].choice.options[i2]);
+    });
+
+    reveal.append(createBigCardBody(ansAsText.toString()));
+  }
   currentCard.append(reveal);
 }
 
@@ -307,7 +336,7 @@ function createTestQuestion() {
     ans.placeholder = "Type your answer here";
     ans.value = givenAnswers[questionIdx];
 
-    ans.addEventListener("keydown", (e) => {
+    ans.addEventListener("keydown", () => {
       givenAnswers[questionIdx] = ans.value;
     });
 
@@ -325,15 +354,17 @@ function createTestQuestion() {
       }
     }
     let shuffledAnswers = [];
-    shuffledAnswerKey = testQuestions[questionIdx].choice.correct;
+    testQuestions[questionIdx].choice.correct = testQuestions[questionIdx].choice.correct.removeUndefined();
+    shuffledAnswerKey = testQuestions[questionIdx].choice.correct.removeUndefined();
+    testQuestions[questionIdx].choice.options = testQuestions[questionIdx].choice.options.removeUndefined();
     for (let c = 0; c < 6; c++) {
-      if (testQuestions[questionIdx].choice.options[c] != "") {
+      if (testQuestions[questionIdx].choice.options[c] != "" && testQuestions[questionIdx].choice.options[c] != undefined) {
         shuffledAnswers.push(testQuestions[questionIdx].choice.options[c]);
       }
     }
     testQuestions[questionIdx].choice.options = shuffle(shuffledAnswers, shuffledAnswerKey, givenAnswers[questionIdx]);
     testQuestions[questionIdx].choice.correct = shuffledAnswerKey;
-    for (let c = 0; c < 6; c++) {
+    for (let c = 0; c < testQuestions[questionIdx].choice.options.length; c++) {
       if (testQuestions[questionIdx].choice.options[c] != "") {
         choiceContainer.append(createMultipleChoiceAnswer(shuffledAnswers[c], blankAmnt != 5, c, givenAnswers[questionIdx][c]));
       }
@@ -463,7 +494,7 @@ function genQuestions() {
     typeSelector.append(selectChoice);
     let selectClick = document.createElement("option");
     selectClick.innerHTML = "click on image";
-    typeSelector.append(selectClick);
+    //typeSelector.append(selectClick);
 
     if (questions[i].type == "text") selectText.selected = "selected";
     if (questions[i].type == "choice") selectChoice.selected = "selected";
@@ -521,8 +552,8 @@ function genQuestions() {
     let del = document.createElement("span");
     del.classList.add("material-symbols-outlined");
     del.classList.add("delBtn");
-    del.style.left = parentPos.x + 225 + "px";
-    del.style.top = parentPos.y + 10 + "px";
+    del.style.left = parentPos.x + 240 + "px";
+    del.style.top = parentPos.y + 0 + "px";
     del.innerHTML = " delete ";
     del.addEventListener("click", (event) => {
       event.preventDefault();
@@ -553,13 +584,18 @@ function genQuestions() {
       categoryRename.style.fontStyle = "italic";
       categorySelector.append(categoryRename);
 
+      let categoryDelete = document.createElement("option");
+      categoryDelete.innerHTML = "Delete";
+      categoryDelete.style.fontStyle = "italic";
+      categorySelector.append(categoryDelete);
+
       e.append(categorySelector);
 
-      categorySelector.addEventListener("focus", (e) => {
+      categorySelector.addEventListener("focus", () => {
         selectedCategoryPrevVal = categorySelector.value;
       });
 
-      categorySelector.addEventListener("change", (e) => {
+      categorySelector.addEventListener("change", () => {
         if (categorySelector.value == "Create new") {
           popup.innerHTML = "";
           categorySelector.value = selectedCategoryPrevVal;
@@ -575,7 +611,7 @@ function genQuestions() {
           inputBox.type = "text";
           inputBox.placeholder = "Press enter to create";
           inputBox.addEventListener("keydown", (e) => {
-            if (e.key == "Enter" && inputBox.value != "" && inputBox.value != "Create new" && inputBox.value != "Rename" && !categories.includes(inputBox.value)) {
+            if (e.key == "Enter" && inputBox.value != "" && inputBox.value != "Create new" && inputBox.value != "Rename" && inputBox.value != "Delete" && !categories.includes(inputBox.value)) {
               questions[i].category = inputBox.value;
               createCategory(inputBox.value);
               removePopup();
@@ -604,8 +640,37 @@ function genQuestions() {
           inputBox.type = "text";
           inputBox.placeholder = "Rename " + selectedCategoryPrevVal + " to";
           inputBox.addEventListener("keydown", (e) => {
-            if (e.key == "Enter" && inputBox.value != "" && inputBox.value != "Create new" && inputBox.value != "Rename" && !categories.includes(inputBox.value)) {
+            if (e.key == "Enter" && inputBox.value != "" && inputBox.value != "Create new" && inputBox.value != "Rename" && inputBox.value != "Delete" && !categories.includes(inputBox.value)) {
               renameCategory(questions[i].category, inputBox.value);
+              genQuestions();
+              removePopup();
+            }
+          });
+
+          popup.append(title);
+          popup.append(someText);
+          popup.append(inputBox);
+
+          inputBox.focus();
+
+          createPopup();
+        } else if (categorySelector.value == "Delete") {
+          popup.innerHTML = "";
+          categorySelector.value = selectedCategoryPrevVal;
+
+          let title = document.createElement("p");
+          title.innerHTML = "Delete '" + selectedCategoryPrevVal + "'?";
+          title.style.fontSize = "30px";
+          title.style.fontWeight = "bold";
+          let someText = document.createElement("p");
+          someText.innerHTML = "Press Esc to escape or Enter to enter";
+          someText.style.fontSize = "10px";
+          let inputBox = document.createElement("input");
+          inputBox.type = "text";
+          inputBox.placeholder = "type whatever you want here it doesn't matter";
+          inputBox.addEventListener("keydown", (e) => {
+            if (e.key == "Enter") {
+              removeCategory(selectedCategoryPrevVal);
               genQuestions();
               removePopup();
             }
@@ -660,7 +725,26 @@ function renameCategory(prev, newName) {
 
 function createCategory(category) {
   categories.push(category);
+  selectedCategories.push(true);
+  selectedNameCategories.push(category);
   genQuestions();
+}
+
+function removeCategory(category) {
+  let idx = categories.indexOf(category);
+  categories.splice(idx, 1);
+  selectedCategories.splice(idx, 1);
+  selectedNameCategories.splice(idx, 1);
+  if (categories.length > 0) {
+    questions.forEach((e) => {
+      if (e.category == category) e.category = categories[0];
+    });
+  } else {
+    createCategory("have at least one category pls");
+    questions.forEach((e) => {
+      if (e.category == category) e.category = categories[0];
+    });
+  }
 }
 
 function removePopup() {
@@ -695,6 +779,14 @@ function shuffle(array, answerKey, extra) {
 
   return array;
 }
+
+Array.prototype.removeUndefined = function () {
+  let removed = [];
+  this.forEach((x) => {
+    if (x != undefined) removed.push(x);
+  });
+  return removed;
+};
 
 function saveFile() {
   popup.innerHTML = "";
@@ -773,11 +865,29 @@ const downloadFile = (contents, name) => {
   link.click();
   URL.revokeObjectURL(link.href);
 };
-
-createQuestion("What is 4+5?", "choice", "", {
-  options: ["1", "2", "3", "9", "5", "6"],
-  correct: [false, false, false, true, false, false],
-});
+/*
+createQuestion(
+  "What is 4+5?",
+  "choice",
+  "",
+  {
+    options: ["1", "2", "3", "9", "5", "6"],
+    correct: [false, false, false, true, false, false],
+  },
+  "math"
+);
+*/
+createQuestion(
+  "What is the first element in the periodic table?",
+  "choice",
+  "",
+  {
+    options: ["Hydrogen", "Helium", "Lithium", "Beryllium", "", ""],
+    correct: [true, false, false, false],
+  },
+  "science"
+);
+//createQuestion("Which continent is Canada in?", "text", "North America", {}, "geography");
 
 /*
 createQuestion("What is 1+1?", "text", "2");

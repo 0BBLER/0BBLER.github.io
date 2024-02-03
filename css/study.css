@@ -1,4 +1,25 @@
+* {
+  font-family: 'Nunito Sans', sans-serif;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgb(216, 216, 216); 
+}
+ 
+::-webkit-scrollbar-thumb {
+  background: rgb(153, 153, 153)
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(180, 180, 180); 
+}
+
 body {
+  font-family: 'Roboto' sans-serif;
   background-color: rgb(200, 200, 200);
   margin-top: 0px;
 }
@@ -58,7 +79,7 @@ td:first-child {
   height: 350px;
   background-color: rgb(240, 240, 240);
   border: 1px solid rgb(200, 200, 200);
-  border-radius: 20px;
+  border-radius: 20px 5px 20px 20px;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
   transition-duration: 300ms;
   margin: 4px;
@@ -100,9 +121,10 @@ td:first-child {
   border: none;
   background-color: transparent;
   height: 20%;
+  width: 95%;
   text-align: center;
   font-weight: bold;
-  font-size: 1.3em;
+  font-size: 1.1em;
 }
 
 .editorQuestion:focus,
