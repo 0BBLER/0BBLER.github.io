@@ -87,14 +87,14 @@ td:first-child {
   padding: 6px;
 }
 
-.delBtn {
+.delBtn, .copyBtn {
   position: absolute;
   cursor: pointer;
   opacity: 0.5;
   transition-duration: 300ms;
 }
 
-.delBtn:hover {
+.delBtn:hover, .copyBtn:hover {
   opacity: 1;
 }
 
@@ -281,6 +281,19 @@ td:first-child {
 
 .infoBtn:hover {
   opacity: 1;
+}
+
+.infoTooltip {
+  position: fixed;
+  z-index: 9999;
+  left: 50%;
+  top: 30px;
+  background-color: rgba(0, 0, 0, 0.61);
+  color:#fff;
+  padding: 4px;
+  font-size: 2em;
+  transition-duration: 400ms;
+  cursor: pointer;
 }
 
 ::placeholder {

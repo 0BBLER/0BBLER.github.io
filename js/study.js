@@ -21,6 +21,9 @@ var currentCard;
 var goBtn;
 var cardAmntPerRow, createButton;
 var selectedCategoryPrevVal = "";
+var localSave = localStorage.getItem("studySaveFile");
+var infoTooltip = document.getElementById("infoTooltip");
+var availableCategories = [];
 
 window.addEventListener("keydown", (e) => {
   if (e.key == "Escape") {
@@ -28,10 +31,15 @@ window.addEventListener("keydown", (e) => {
   }
 });
 
+infoTooltip.style.opacity = "0";
+infoTooltip.style.visibility = "hidden";
+
+loadLocalStorage();
+
 popup.style.left = "-400px";
 popup.style.opacity = "1";
 modeBtn.innerHTML = "Test me";
-resultsButton.style.opacity = 0;
+resultsButton.style.opacity = "0";
 
 document.body.addEventListener("keydown", (e) => {
   if (!isTestMode) return;
@@ -96,13 +104,36 @@ function toggleTest() {
   } else {
     isTestMode = true;
     modeBtn.innerHTML = "Back to editor";
+
+    availableCategories = [];
+
+    categories.forEach((category) => {
+      if (questions.map((x) => x.category).includes(category)) availableCategories.push(category);
+    });
+
     for (let i = 0; i < questionElements.length; i++) {
       questionElements[i].remove();
     }
-    if (categories.length > 1) {
-      getTestCategories();
-    } else {
+    let categoriesGood = false;
+    for (let i = 0; i < selectedNameCategories.length; i++) {
+      if (availableCategories.includes(selectedNameCategories[i])) {
+        categoriesGood = true;
+        break;
+      }
+    }
+    if (availableCategories.length == 1) {
+      selectedNameCategories = [];
+      selectedNameCategories.push(availableCategories[0]);
+      selectedCategories = new Array(categories.length);
+      selectedCategories.fill(false);
+      selectedCategories[categories.indexOf(availableCategories[0])] = true;
       setupTest();
+    } else {
+      if (availableCategories.length > 1 || selectedCategories.indexOf(true) == -1 || !categoriesGood) {
+        getTestCategories();
+      } else {
+        setupTest();
+      }
     }
   }
 }
@@ -115,17 +146,13 @@ function getTestCategories() {
 
   currentCard.append(createBigCardTitle("Select the categories you would like to study"));
 
-  let availableCategories = [];
-
-  categories.forEach((category) => {
-    if (questions.map((x) => x.category).includes(category)) availableCategories.push(category);
-  });
-
-  if (availableCategories.length < 2) {
+  /*
+  if (availableCategories.length < 2 && selectedNameCategories.length > 0) {
     currentCard.remove();
     setupTest();
     return;
   }
+  */
 
   for (let i = 0; i < categories.length; i++) {
     let temp = document.createElement("div");
@@ -168,7 +195,7 @@ function getTestCategories() {
         dummyTestQuestions.push(questions[i]);
       }
     }
-    if (dummyTestQuestions.length < 2) {
+    if (dummyTestQuestions.length < 1) {
       let noQuestions = document.createElement("p");
       noQuestions.innerHTML = "There are no questions under the selected " + (selectedCategories.filter((el) => el).length == 1 ? "category." : "categories.");
       noQuestions.style.backgroundColor = "rgb(200,100,100)";
@@ -221,7 +248,7 @@ function viewResults() {
         t.style.backgroundColor = "rgb(100,200,100)";
       }
     } else if (testQuestions[i].type == "choice") {
-      if (arrayEquals(testQuestions[i].choice.correct, givenAnswers[i])) {
+      if (arrayEquals(givenAnswers[i], testQuestions[i].choice.correct)) {
         t.style.backgroundColor = "rgb(100,200,100)";
       }
     }
@@ -260,7 +287,12 @@ function viewResults() {
 }
 
 function arrayEquals(arr1, arr2) {
-  return arr1.every((c1, c2) => c1 === arr2[c2]);
+  if (arr1 == "" || arr2 == "") return false;
+  if (arr1.every((c1, c2) => c1 === arr2[c2])) {
+    return true;
+  } else {
+    return arr2.every((c1, c2) => c1 === arr1[c2]);
+  }
 }
 
 function setupTest() {
@@ -507,6 +539,7 @@ function genQuestions() {
 
     question.addEventListener("change", function (e) {
       questions[i].question = question.value;
+      saveToLocal();
     });
 
     question.addEventListener("keydown", function (e) {
@@ -533,6 +566,7 @@ function genQuestions() {
       if (typeSelector.value == "text answer") questions[i].type = "text";
       if (typeSelector.value == "multiple choice") questions[i].type = "choice";
       if (typeSelector.value == "click on image") questions[i].type = "click";
+      saveToLocal();
       genQuestions();
     });
 
@@ -547,6 +581,7 @@ function genQuestions() {
 
       answer.addEventListener("change", function (e) {
         questions[i].answer = answer.value;
+        saveToLocal();
       });
 
       e.append(answer);
@@ -567,6 +602,7 @@ function genQuestions() {
         };
         choice.onchange = function () {
           questions[i].choice.options[choiceIdx] = choice.value;
+          saveToLocal();
         };
         e.append(choice);
       }
@@ -590,6 +626,20 @@ function genQuestions() {
     });
 
     e.appendChild(del);
+
+    let copy = document.createElement("span");
+    copy.classList.add("material-symbols-outlined");
+    copy.classList.add("copyBtn");
+    copy.style.left = parentPos.x + 240 + "px";
+    copy.style.top = parentPos.y + 24 + "px";
+    copy.innerHTML = " content_copy ";
+    copy.addEventListener("click", (event) => {
+      event.preventDefault();
+      questions.splice(i + 1, 0, JSON.parse(JSON.stringify(questions[i])));
+      genQuestions();
+    });
+
+    e.appendChild(copy);
 
     if (categories.length > 0) {
       let categorySelector = document.createElement("select");
@@ -642,6 +692,7 @@ function genQuestions() {
             if (e.key == "Enter" && inputBox.value != "" && inputBox.value != "Create new" && inputBox.value != "Rename" && inputBox.value != "Delete" && !categories.includes(inputBox.value)) {
               questions[i].category = inputBox.value;
               createCategory(inputBox.value);
+              saveToLocal();
               removePopup();
             }
           });
@@ -713,6 +764,7 @@ function genQuestions() {
           createPopup();
         } else {
           questions[i].category = categorySelector.value;
+          saveToLocal();
         }
       });
     }
@@ -747,6 +799,12 @@ function genQuestions() {
 
   questionEditor.append(createButton);
   questionElements.push(createButton);
+
+  saveToLocal();
+}
+
+function saveToLocal() {
+  localStorage.setItem("studySaveFile", JSON.stringify({ version: "0.1", categories: categories, file: questions }));
 }
 
 function renameCategory(prev, newName) {
@@ -850,6 +908,8 @@ function saveFile() {
 }
 
 function loadFile() {
+  localSave = localStorage.getItem("studySaveFile");
+
   popup.innerHTML = "";
 
   let title = document.createElement("p");
@@ -862,23 +922,32 @@ function loadFile() {
   someText.style.fontSize = "10px";
   let inputBox = document.createElement("input");
   inputBox.type = "file";
+  inputBox.accept = ".study";
   inputBox.addEventListener("change", (e) => {
     let input = e.target.files[0];
+    renderTooltip("Loaded " + e.target.files[0].name);
     if (input.name.includes(".study")) {
       let reader = new FileReader();
       reader.readAsText(input, "UTF-8");
       reader.onload = function (e) {
         questions = JSON.parse(e.target.result).file;
         window.setTimeout(function () {
-          genQuestions();
+          try {
+            genQuestions();
+          } catch (err) {
+            renderTooltip(err + " - reloading in 4s");
+            window.setTimeout(function () {
+              loadLocalStorage(true);
+            }, 4000);
+          }
         }, 100);
       };
       reader.onerror = function () {
-        alert("error reading file");
+        renderTooltip("Error reading file");
       };
       removePopup();
     } else {
-      alert("bad file");
+      renderTooltip("Should be a .study file");
       removePopup();
     }
   });
@@ -890,6 +959,25 @@ function loadFile() {
   createPopup();
 }
 
+function loadLocalStorage(shouldGen) {
+  if (localSave != null && JSON.parse(localSave).version == "0.1" && JSON.parse(localSave).file.length > 0) {
+    questions = JSON.parse(localSave).file;
+
+    categories = JSON.parse(localSave).categories;
+    selectedCategories = new Array(categories.length);
+    selectedCategories.fill(false);
+
+    selectedNameCategories = [];
+
+    renderTooltip("Restored previous session");
+    if (shouldGen) {
+      genQuestions();
+    }
+  } else {
+    genPresetQuestions();
+  }
+}
+
 const downloadFile = (contents, name) => {
   const link = document.createElement("a");
   const blob = new Blob([contents], { type: "text/plain" });
@@ -899,37 +987,64 @@ const downloadFile = (contents, name) => {
   URL.revokeObjectURL(link.href);
 };
 
-createQuestion(
-  "What is 4+5?",
-  "choice",
-  "",
-  {
-    options: ["1", "2", "3", "9", "5", "6"],
-    correct: [false, false, false, true, false, false],
-  },
-  "math"
-);
+function renderTooltip(text, event) {
+  infoTooltip.style.visibility = "visible";
+  infoTooltip.innerText = text;
+  infoTooltip.style.opacity = "1";
+  infoTooltip.onclick = () => {
+    infoTooltip.style.opacity = "0";
+    infoTooltip.style.visibility = "hidden";
+    if (event != undefined) {
+      event();
+    }
+  };
+  window.setTimeout(() => {
+    infoTooltip.style.opacity = "0";
+    infoTooltip.style.visibility = "hidden";
+    infoTooltip.onclick = () => {};
+  }, 4000);
+}
 
-createQuestion(
-  "What is the first element in the periodic table?",
-  "choice",
-  "",
-  {
-    options: ["Hydrogen", "Helium", "Lithium", "Beryllium", "", ""],
-    correct: [true, false, false, false],
-  },
-  "science"
-);
-createQuestion("Which continent is Canada in?", "text", "North America", {}, "geography");
+function genPresetQuestions() {
+  createQuestion(
+    "What is 4+5?",
+    "choice",
+    "",
+    {
+      options: ["1", "2", "3", "9", "5", "6"],
+      correct: [false, false, false, true, false, false],
+    },
+    "math"
+  );
 
-/*
-createQuestion("What is 1+1?", "text", "2");
-createQuestion("What is 2+3?", "text", "5");
-createQuestion("What is 4+5?", "text", "9");
-createQuestion("What is 43+1?", "text", "44");
-createQuestion("What is 2+3?", "text", "5");
-createQuestion("What is 6+5?", "text", "11");
-createQuestion("What is 54+1?", "text", "55");
-createQuestion("What is 1+3?", "text", "4");
-*/
-genQuestions();
+  createQuestion(
+    "What is the first element in the periodic table?",
+    "choice",
+    "",
+    {
+      options: ["Hydrogen", "Helium", "Lithium", "Beryllium", "", ""],
+      correct: [true, false, false, false],
+    },
+    "science"
+  );
+  createQuestion("Which continent is Canada in?", "text", "North America", {}, "geography");
+
+  /*
+  createQuestion("What is 1+1?", "text", "2");
+  createQuestion("What is 2+3?", "text", "5");
+  createQuestion("What is 4+5?", "text", "9");
+  createQuestion("What is 43+1?", "text", "44");
+  createQuestion("What is 2+3?", "text", "5");
+  createQuestion("What is 6+5?", "text", "11");
+  createQuestion("What is 54+1?", "text", "55");
+  createQuestion("What is 1+3?", "text", "4");
+  */
+}
+try {
+  genQuestions();
+} catch (err) {
+  renderTooltip("Failed to load from local storage. Click this text to reset", () => {
+    localStorage.removeItem("studySaveFile");
+    location.reload();
+  });
+}
