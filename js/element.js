@@ -391,6 +391,12 @@ function drawTable() {
   g.font = "small-caps " + 85 * elementRatio + "px Courier New";
   if (gameType == 0) {
     g.strokeText("Guesses: " + guesses, skip * 3, skip * 1.6);
+    g.font = "small-caps " + 40 * elementRatio + "px Courier New";
+    if (secretElementHighscore == null) {
+      g.strokeText("No highscore (yet)", skip * 3, skip * 2.4);
+    } else {
+      g.strokeText("Best: " + secretElementHighscore, skip * 3, skip * 2.4);
+    }
   } else {
     g.strokeText("Time: " + timer / 1000.0 + "s", skip * 3, skip * 1.6);
     g.font = "small-caps " + 40 * elementRatio + "px Courier New";
