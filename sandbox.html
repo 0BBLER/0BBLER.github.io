@@ -1,31 +1,37 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="UTF-8">
-        <link rel="stylesheet" href="css/style.css">
-        <link rel="icon" type="image/x-icon" href="favicon.ico">
-        <title>0BBLER.github.io</title>
-    </head>
-    <body>
-        
-        <div>
-        <input disabled placeholder="0BBLER.github.io" class="topbar" value="0BBLER.github.io/sandbox"></input>
-        </div>
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <title>0BBLER.github.io</title>
+  </head>
+  <body>
+    <div id="titleText" onclick="navigator.clipboard.writeText('https:/\/0bbler.github.io/')" style="font-size: 2.5em; left: 15px; opacity: 1">0BBLER.github.io</div>
+    <div id="l1" class="line" style="top: 4.2em; left: 15px; width: 38em"></div>
+    <div id="desc" onclick="window.location.href = 'https:/\/sandspiel.club/'" style="font-size:1.5em; left: 15px; top: 3.3em; opacity: 1">
+      I tried to remake <a href="https://sandspiel.club/">sandspiel.club</a>
+    </div>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <p>
+      <tb onclick="reset()">|RESET|</tb> <tb id="air" onclick="setSelected(0)">AIR</tb> <tb id="rock" onclick="setSelected(1)">ROCK</tb> <tb id="sand" onclick="setSelected(2)">SAND</tb>
+      <tb id="water" onclick="setSelected(3)">WATER</tb> <tb id="wood" onclick="setSelected(6)">WOOD</tb> <tb id="fire" onclick="setSelected(8)">FIRE</tb>
+    </p>
+    <p id="brushSizer">Brush size: <tb onclick="changeBrushSize(-1)">&lt;</tb> 2 <tb onclick="changeBrushSize(1)">&gt;</tb></p>
+    <p id="pauseBtn" onclick="togglePause()">Press space or press this to pause</p>
+    <p onclick="homeButton()">Back arrow</p>
+    <br />
 
-        &nbsp;
-        <p><st>1 </st>Sandbox Game</p>
-        <p><st>2 </st>Inspired by <a href="https://sandspiel.club/">sandspiel.club</a></p>
-        <p><st>3 </st></p>
-        <p><st>4 </st><tb onclick="reset()">|RESET|</tb> <tb id="air" onclick="setSelected(0)">AIR</tb> <tb id="rock" onclick="setSelected(1)">ROCK</tb> <tb id="sand" onclick="setSelected(2)">SAND</tb> <tb id="water" onclick="setSelected(3)">WATER</tb> <tb id="wood" onclick="setSelected(6)">WOOD</tb> <tb id="fire" onclick="setSelected(8)">FIRE</tb></p>
-        <p id="brushSizer"><st>5 </st>Brush size: <tb onclick="changeBrushSize(-1)">&lt;</tb> 2 <tb onclick="changeBrushSize(1)">&gt;</tb></p>
-        <p id="pauseBtn" onclick="togglePause()"><st>6 </st>Press space or press this to pause</p>
-        <p onclick="homeButton()"><st>7 </st>Back arrow</p>
-        <br>
+    <canvas id="game" style="position: absolute; left: 10px; top: 190px; background-color: rgb(159, 255, 255); border: 2px solid rgb(0, 132, 150)"></canvas>
 
-        <canvas id="game" style="position: absolute; left: 10px; top: 190px; background-color: rgb(159, 255, 255); border: 2px solid rgb(0, 132, 150)"></canvas>
-        
-        <script src="js/sandbox.js"></script>
-        <script src="js/common.js"></script>
-
-    </body>
+    <script src="js/sandbox.js"></script>
+    <script src="js/common.js"></script>
+  </body>
 </html>

@@ -20,7 +20,7 @@ var graphTop = 0;
 var first = true;
 
 document.getElementById("total").innerHTML =
-  "<st>8 </st>Total clicks: " + clicks;
+  "Total clicks: " + clicks;
 
 function clicked() {
   if (first) {
@@ -32,7 +32,7 @@ function clicked() {
 
   clicks++;
   document.getElementById("total").innerHTML =
-    "<st>8 </st>Total clicks: " + clicks;
+    "Total clicks: " + clicks;
 }
 function rightclicked() {
   if (first) {
@@ -43,7 +43,7 @@ function rightclicked() {
 
   clicks++;
   document.getElementById("total").innerHTML =
-    "<st>8 </st>Total clicks: " + clicks;
+    "Total clicks: " + clicks;
 }
 
 function updateClicks() {
@@ -84,11 +84,11 @@ function updateClicks() {
   }
 
   document.getElementById("lresult").innerHTML =
-    "<st>5 </st>Left CPS: " + lcps + " | Best: " + toplcps;
+    "Left CPS: " + lcps + " | Best: " + toplcps;
   document.getElementById("rresult").innerHTML =
-    "<st>6 </st>Right CPS: " + rcps + "| Best: " + toprcps;
+    "Right CPS: " + rcps + " | Best: " + toprcps;
   document.getElementById("tresult").innerHTML =
-    "<st>7 </st>Combined CPS: " + tcps + "| Best: " + topCps;
+    "Combined CPS: " + tcps + " | Best: " + topCps;
 }
 
 document

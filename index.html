@@ -1,30 +1,40 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="UTF-8">
-        <link rel="stylesheet" href="css/style.css">
-        <link rel="icon" type="image/x-icon" href="favicon.ico">
-        <title>0BBLER.github.io</title>
-    </head>
-    <body>
-        <script src="js/javascript.js"></script>
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/index.css" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
 
-        <input disabled placeholder="0BBLER.github.io" class="topbar" value="0BBLER.github.io"></input>
+    <script src="js/index.js"></script>
 
-        &nbsp;
-        <p id="helloWorld" onclick="c1()"><st>1 </st>Hello World</p>
-        <p onclick="c2()"><st>2 </st>I sometimes am <a href="javascript:void">0BBLER</a></p>
-        <p onclick="c3()"><st>3 </st>I sometimes like <a style="color:rgb(253, 188, 199)" href="javascript:void">pigs</a></p>
-        <p onclick="c4()"><st>4 </st>I sometimes play <a style="color:rgb(0, 112, 24)" href="javascript:void">Minecraft</a></p>
-        <p onclick="c5()"><st>5 </st>I sometimes code in <a style="color:rgb(112, 0, 0)" href="javascript:void">Java</a></p>
-        <p onclick="c6()"><st>6 </st></p>
-        <p onclick="c7()"><st>7 </st>Some cool things:</p>
-        <p class="pagelink" onclick="c8()"><st>8 </st>Sandbox</p>
-        <p class="pagelink" onclick="c9()"><st>9 </st>Secret Element</p>
-        <p class="pagelink" onclick="c10()"><st>10 </st>Fresh Fish</p>
-        <p class="pagelink" onclick="c11()"><st>11 </st>CPS counter</p>
-        <p onclick="c11()"><st>12 </st></p>
+    <title>0BBLER.github.io</title>
+  </head>
+  <body onload="bodyLoaded()">
+    
+    <div id="bigCircle" class="bigCircle"></div>
 
-        <p style="position:absolute; bottom:10px; opacity: 0.7;">this website was intended for use on a computer, so it may break on mobile devices</p>
-    </body>
+    <div id="titleText" onclick="navigator.clipboard.writeText('https:/\/0bbler.github.io/')" style="left: -500px; opacity: 0">0BBLER.github.io</div>
+    <div id="l1" class="line" style="left: 15px;"></div>
+    <div id="desc" onclick="window.location.href = 'https:/\/github.com/0BBLER'" style="left: -500px; opacity: 0">Made by 0BBLER</div>
+
+    <div id="btnContainer" style="position: absolute; top: 15em; left:10px">
+      <div onclick="window.location.href = 'https:/\/0bbler.github.io/element'" class="siteButton">Secret Element</div>
+      <a onclick="window.location.href = 'https:/\/0bbler.github.io/sandbox'" class="siteButton">Sandbox</a>
+      <a onclick="window.location.href = 'https:/\/0bbler.github.io/clickspeed'" class="siteButton">CPS Counter</a>
+    </div>
+
+    <p style="position:absolute;top:1000px">Hi</p>
+
+    <p id="deviceWarning">
+      this website was intended for use on a computer, so it'll probably break
+      on mobile devices
+    </p>
+  </body>
 </html>

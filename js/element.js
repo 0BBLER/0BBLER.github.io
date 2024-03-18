@@ -1,5 +1,6 @@
 var table = document.getElementById("table");
 var gameSwitcher = document.getElementById("gameSwitcher");
+var gameTypeDisplay = document.getElementById("gameTypeDisplay");
 var gameRules = document.getElementById("htp");
 var elementSize = 70;
 var elementMargin = elementSize / 17.5;
@@ -18,6 +19,8 @@ var timerAccuracy = 100;
 var timerEstimate = 0;
 var timerActive = false;
 var elementRatio = 1;
+var periodicTableFillHighscore = localStorage.getItem("periodicTableFillHighscore");
+var secretElementHighscore = localStorage.getItem("secretElementHighscore");
 
 //account for max scaling
 table.width = 18 * 130 + 18 * (130 / 17.5);
@@ -390,6 +393,12 @@ function drawTable() {
     g.strokeText("Guesses: " + guesses, skip * 3, skip * 1.6);
   } else {
     g.strokeText("Time: " + timer / 1000.0 + "s", skip * 3, skip * 1.6);
+    g.font = "small-caps " + 40 * elementRatio + "px Courier New";
+    if (periodicTableFillHighscore == null) {
+      g.strokeText("No highscore (yet)", skip * 3, skip * 2.4);
+    } else {
+      g.strokeText("Best: " + periodicTableFillHighscore, skip * 3, skip * 2.4);
+    }
   }
   g.lineWidth = 3;
   g.strokeStyle = "rgb(220, 220, 220, 0.3)";
@@ -414,72 +423,39 @@ function drawElement(id, x, y) {
     if (id < 119 && id > -1) {
       g.fillStyle =
         "rgb(" +
-        ((farthestDistance -
-          getDistance(getElementIn(SECRET_ELEMENT + 1), id)) /
-          farthestDistance) *
-          255 +
+        ((farthestDistance - getDistance(getElementIn(SECRET_ELEMENT + 1), id)) / farthestDistance) * 255 +
         ", " +
-        (getDistance(getElementIn(SECRET_ELEMENT + 1), id) / farthestDistance) *
-          150 +
+        (getDistance(getElementIn(SECRET_ELEMENT + 1), id) / farthestDistance) * 150 +
         ", " +
-        (getDistance(getElementIn(SECRET_ELEMENT + 1), id) / farthestDistance) *
-          255 +
+        (getDistance(getElementIn(SECRET_ELEMENT + 1), id) / farthestDistance) * 255 +
         ")";
 
       g.fillRect(x, y, elementSize, elementSize);
       g.strokeStyle = "rgb(30, 30, 30)";
       g.font = "small-caps " + 10 * elementRatio + "px Courier New";
-      g.strokeText(
-        elements[elementData[id].id - 1][0],
-        x + 2 * elementRatio,
-        y + 20 * elementRatio
-      );
+      g.strokeText(elements[elementData[id].id - 1][0], x + 2 * elementRatio, y + 20 * elementRatio);
       g.font = "small-caps " + 12 * elementRatio + "px Courier New";
-      g.strokeText(
-        elementData[id].id,
-        x + 2 * elementRatio,
-        y + 10 * elementRatio
-      );
+      g.strokeText(elementData[id].id, x + 2 * elementRatio, y + 10 * elementRatio);
       g.font = "small-caps " + 30 * elementRatio + "px Courier New";
       g.strokeStyle = "rgb(255, 255, 255, 0.6)";
-      g.strokeText(
-        abbreviations[elementData[id].id - 1],
-        x + 20 * elementRatio,
-        y + 45 * elementRatio
-      );
+      g.strokeText(abbreviations[elementData[id].id - 1], x + 20 * elementRatio, y + 45 * elementRatio);
     }
   } else {
     if (showNumbers) {
       g.font = "small-caps " + 12 * elementRatio + "px Courier New";
-      g.strokeText(
-        elementData[id].id,
-        x + 2 * elementRatio,
-        y + 10 * elementRatio
-      );
+      g.strokeText(elementData[id].id, x + 2 * elementRatio, y + 10 * elementRatio);
     }
     if (shownCharacters > 0) {
       g.font = "small-caps " + 12 * elementRatio + "px Courier New";
-      g.strokeText(
-        elements[elementData[id].id - 1][0].slice(0, shownCharacters),
-        x + 2 * elementRatio,
-        y + 20 * elementRatio
-      );
+      g.strokeText(elements[elementData[id].id - 1][0].slice(0, shownCharacters), x + 2 * elementRatio, y + 20 * elementRatio);
     }
     if (showAbbreviations) {
       g.font = "small-caps " + 30 * elementRatio + "px Courier New";
       g.strokeStyle = "rgb(255, 255, 255, 0.6)";
-      g.strokeText(
-        abbreviations[elementData[id].id - 1],
-        x + 20 * elementRatio,
-        y + 45 * elementRatio
-      );
+      g.strokeText(abbreviations[elementData[id].id - 1], x + 20 * elementRatio, y + 45 * elementRatio);
     }
   }
-  if (
-    elementData[id].id - 1 == SECRET_ELEMENT &&
-    revealAnswer > 0 &&
-    gameType == 0
-  ) {
+  if (elementData[id].id - 1 == SECRET_ELEMENT && revealAnswer > 0 && gameType == 0) {
     g.lineWidth = 3;
     g.strokeStyle = "rgb(255, 255, 255)";
     g.strokeRect(x, y, elementSize, elementSize);
@@ -489,28 +465,16 @@ function drawElement(id, x, y) {
     g.fillRect(x, y, elementSize, elementSize);
     g.strokeStyle = "rgb(30, 30, 30)";
     g.font = "small-caps " + 10 * elementRatio + "px Courier New";
-    g.strokeText(
-      elements[elementData[id].id - 1][0],
-      x + 2 * elementRatio,
-      y + 20 * elementRatio
-    );
-    g.strokeText(
-      elementData[id].id,
-      x + 2 * elementRatio,
-      y + 10 * elementRatio
-    );
+    g.strokeText(elements[elementData[id].id - 1][0], x + 2 * elementRatio, y + 20 * elementRatio);
+    g.strokeText(elementData[id].id, x + 2 * elementRatio, y + 10 * elementRatio);
     g.font = "small-caps " + 30 * elementRatio + "px Courier New";
     g.strokeStyle = "rgb(0, 0, 0, 0.6)";
-    g.strokeText(
-      abbreviations[elementData[id].id - 1],
-      x + 20 * elementRatio,
-      y + 45 * elementRatio
-    );
+    g.strokeText(abbreviations[elementData[id].id - 1], x + 20 * elementRatio, y + 45 * elementRatio);
   }
 }
 
 var input = document.getElementById("elementIn");
-input.addEventListener("keyup", function () {
+input.addEventListener("input", function () {
   for (let k = 0; k < elements.length; k++) {
     let tryElement = getElementIn(k + 1);
     if (elements[k].includes(input.value.toUpperCase())) {
@@ -525,11 +489,7 @@ input.addEventListener("keyup", function () {
           firstElement = false;
           startTimer();
         }
-        if (
-          gameType == 1 &&
-          revealAnswer == 0 &&
-          !revealedElements.includes(undefined)
-        ) {
+        if (gameType == 1 && revealAnswer == 0 && !revealedElements.includes(undefined)) {
           win();
           stopTimer();
         }
@@ -577,16 +537,34 @@ function resetGame() {
 function win() {
   if (revealAnswer < 2) {
     if (gameType == 1) {
-      document.getElementById("score").innerHTML =
-        "Time: " + timer / 1000.0 + "s";
+      document.getElementById("score").innerHTML = "Time: " + timer / 1000.0 + "s";
+      if (testFillHighscore(timer / 1000)) {
+        let newHighscore = document.createElement("p");
+        newHighscore.innerHTML = "New highscore! [" + timer / 1000 + "s]";
+        newHighscore.style.fontSize = "0.8em";
+        newHighscore.style.margin = "0px";
+        document.getElementById("element_win").append(newHighscore);
+      }
     } else {
       document.getElementById("score").innerHTML = "Guesses: " + guesses;
+      if (testGameHighscore(guesses)) {
+        let newHighscore = document.createElement("p");
+        newHighscore.innerHTML = "New highscore! [" + guesses + "]";
+        newHighscore.style.fontSize = "0.8em";
+        newHighscore.style.margin = "0px";
+        document.getElementById("element_win").append(newHighscore);
+      }
     }
     document.getElementById("element_win").classList.add("element_win_show");
+    document.getElementById("element_win").children[0].style.margin = "29px";
+    document.getElementById("element_win").children[1].style.margin = "7px";
   }
 }
 
 function closeWin() {
+  while (document.getElementById("element_win").children[2] != undefined) {
+    document.getElementById("element_win").children[2].remove();
+  }
   resetGame();
 }
 function rand(max) {
@@ -639,15 +617,13 @@ function toggleAbbreviations() {
 function switchGame() {
   if (gameType == 0) {
     gameType = 1;
-    gameSwitcher.innerHTML = "Game: Timed full periodic table";
-    gameRules.innerHTML =
-      "<st>7 </st>Try to fill in the periodic table in the least amount of time! Also there's some buttons above to help.";
+    gameTypeDisplay.innerHTML = "Currently: Periodic table fill";
+    gameRules.innerHTML = "Try to fill in the periodic table in the least amount of time! Also there's some buttons above to help.";
     resetGame();
   } else {
     gameType = 0;
-    gameSwitcher.innerHTML = "Game: Secret Element";
-    gameRules.innerHTML =
-      "<st>7 </st>A secret element is chosen and you have to guess what it is in a sort of hot/cold style. Type an element into the box below:";
+    gameTypeDisplay.innerHTML = "Currently: Secret Element";
+    gameRules.innerHTML = "A secret element is chosen and you have to guess what it is in a sort of hot/cold style. Type an element into the box below:";
     resetGame();
   }
 }
@@ -677,8 +653,8 @@ function timerTick() {
 setElementSize(elementSize);
 
 var scaler = document.getElementById("scaler");
-scaler.addEventListener("change", function () {
-  setElementSize(parseInt(scaler.value));
+scaler.addEventListener("input", function (e) {
+  setElementSize(parseInt(e.target.value));
 });
 
 function setElementSize(size) {
@@ -689,4 +665,34 @@ function setElementSize(size) {
   initializeTable();
   //document.getElementById("backButton").style.top = 9 * elementSize + 9 * elementMargin + elementSize / 8 + 240 + "px";
   drawTable();
+}
+
+function testFillHighscore(score) {
+  if (periodicTableFillHighscore == null) {
+    periodicTableFillHighscore = score;
+    localStorage.setItem("periodicTableFillHighscore", score);
+    return true;
+  } else {
+    if (score < periodicTableFillHighscore) {
+      periodicTableFillHighscore = score;
+      localStorage.setItem("periodicTableFillHighscore", score);
+      return true;
+    }
+  }
+  return false;
+}
+
+function testGameHighscore(score) {
+  if (secretElementHighscore == null) {
+    secretElementHighscore = score;
+    localStorage.setItem("secretElementHighscore", score);
+    return true;
+  } else {
+    if (score < secretElementHighscore) {
+      secretElementHighscore = score;
+      localStorage.setItem("secretElementHighscore", score);
+      return true;
+    }
+  }
+  return false;
 }

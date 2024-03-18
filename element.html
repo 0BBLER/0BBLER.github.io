@@ -1,36 +1,46 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="css/style.css">
-        <link rel="icon" type="image/x-icon" href="favicon.ico">
-        <title>0BBLER.github.io</title>
-    </head>
-    <body style="overflow-x: hidden; overflow-y: hidden;">
-        
-        <div>
-        <input disabled placeholder="0BBLER.github.io" class="topbar" value="0BBLER.github.io/element">
-        </div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <title>0BBLER.github.io</title>
+  </head>
+  <body style="overflow-x: hidden">
+    &nbsp;
+    <div id="titleText" onclick="navigator.clipboard.writeText('https:/\/0bbler.github.io/')" style="font-size: 2.5em; left: 15px; opacity: 1">0BBLER.github.io</div>
+    <div id="l1" class="line" style="top: 5.5em; left: 15px; width: 38em"></div>
+    <div id="desc" onclick="window.location.href = 'https:/\/github.com/0BBLER'" style="font-size:1.5em; left: 15px; top: 4.3em; opacity: 1">
+      A JavaScript recreation of <a href="https://www.sporcle.com/games/goc3/secret-element-i">Secret Element</a>
+    </div>
+    <div style="position: absolute; top: 9em">
+      <div id="gameTypeDisplay" style="position: absolute; padding: 0.2em; height: fit-content; width: fit-content; background-color: rgb(97, 97, 97); font-size: 0.6em">Currently: Secret Element</div>
+      <p><tb id="gameSwitcher" onclick="switchGame()">Change game type</tb> <tb onclick="resetGame()">NEW GAME</tb> | Table size: <input id="scaler" value="70" min="10" max="130" type="range" /></p>
+      <p>
+        <tb onclick="toggleNumbers()" id="numT">Toggle numbers</tb> <tb id="abbT" onclick="toggleAbbreviations()">Toggle abbreviations</tb>
+        <tb id="charT" onclick="toggleCharacters()">Cycle shown characters</tb> <tb onclick="reveal()">REVEAL ANSWER</tb> <-- Some fun buttons to help
+      </p>
+      <p>How to Play:</p>
+      <p id="htp">A secret element is chosen and you have to guess what it is in a sort of hot/cold style. Type an element into the box below:</p>
+      <p><input autofocus onblur="this.focus()" spellcheck="false" id="elementIn" size="50" /></p>
 
-        &nbsp;
-        <p><st>1 </st>Secret Element</p>
-        <p><st>2 </st>A JavaScript recreation of <a href="https://www.sporcle.com/games/goc3/secret-element-i">Secret Element</a></p>
-        <p><st>3 </st></p>
-        <p><st>5 </st><tb onclick="resetGame()">NEW GAME</tb> <input id="scaler" value="70" min="10" max="130" type="range"> <tb id="gameSwitcher" onclick="switchGame()">Game: Secret Element</tb></p>
-        <p><st>4 </st><tb onclick="toggleNumbers()" id="numT">Toggle numbers</tb> <tb id="abbT" onclick="toggleAbbreviations()">Toggle abbreviations</tb> <tb id="charT" onclick="toggleCharacters()">Cycle shown characters</tb> <tb onclick="reveal()">REVEAL ANSWER</tb> &#8592 Some fun buttons to help</p>
-        <p><st>6 </st>How to Play:</p>
-        <p id="htp"><st>7 </st>A secret element is chosen and you have to guess what it is in a sort of hot/cold style. Type an element into the box below:</p>
-        <p><st>8 </st><input autofocus onblur="this.focus()" spellcheck="false" id="elementIn" size="50"></p>
-        
-        <canvas class="periodicTable" id="table"></canvas>
-        
-        <p id="backButton" onclick="homeButton()" style="position:absolute; bottom:10px; width:100%"><st>9 </st>Back arrow</p>
+      <canvas class="periodicTable" id="table"></canvas>
 
-        <div onclick="closeWin()" id="element_win" class="element_win"><h1 style="background-color: transparent;">VICTORY!</h1><h3 id="score" style="top:340px">Guesses: </h3></div>
+      <tb id="backButton" onclick="homeButton()" style="position: fixed; bottom: 40px">Back arrow</tb>
 
-        <script src="js/element.js"></script>
-        <script src="js/common.js"></script>
+      <div onclick="closeWin()" id="element_win" class="element_win">
+        <h1 style="background-color: transparent">VICTORY!</h1>
+        <h3 id="score" style="top: 340px">Guesses:</h3>
+      </div>
 
-    </body>
+      <p id="deviceWarning">this website was intended for use on a computer, and this specific page is a great demonstration of that</p>
+
+      <script src="js/element.js"></script>
+      <script src="js/common.js"></script>
+    </div>
+  </body>
 </html>

@@ -1,7 +1,7 @@
 const gamesize = 900;
 const pixelSize = 9; //explosive, do not touch
 const pixelSideCount = Math.round(gamesize / pixelSize);
-const canvasYCoord = 210;
+const canvasYCoord = 260;
 const colours = [
   "#9fffff",
   "#a6a6a6",
@@ -33,6 +33,7 @@ const hex = [
   "e",
   "f",
 ];
+var mobile = null;
 var airBtn = document.getElementById("air");
 var rockBtn = document.getElementById("rock");
 var sandBtn = document.getElementById("sand");
@@ -65,7 +66,7 @@ sandBtn.classList.add("tbSelected");
 var brushSize = 3;
 
 document.getElementById("brushSizer").innerHTML =
-  '<st>5 </st>Brush size: <tb onclick="changeBrushSize(-1)">&lt;</tb> ' +
+  'Brush size: <tb onclick="changeBrushSize(-1)">&lt;</tb> ' +
   brushSize +
   ' <tb onclick="changeBrushSize(1)">&gt;</tb>';
 
@@ -541,10 +542,10 @@ document.body.onkeyup = function (e) {
 function togglePause() {
   PAUSE = !PAUSE;
   if (PAUSE) {
-    document.getElementById("pauseBtn").innerHTML = "<st>5 </st>Paused";
+    document.getElementById("pauseBtn").innerHTML = "Paused";
   } else {
     document.getElementById("pauseBtn").innerHTML =
-      "<st>5 </st>Press space or press this to pause";
+      "Press space or press this to pause";
   }
 }
 
@@ -671,23 +672,36 @@ tick();
 window.requestAnimationFrame(tick);
 
 window.addEventListener("mousemove", (event) => {
-  mouseX = event.clientX;
+  if (!mobile) {
+    mouseX = event.clientX;
+    mouseY = event.clientY;
+  }
   mcx = mouseX - 10;
-  mouseY = event.clientY;
   mcy = mouseY - canvasYCoord + document.documentElement.scrollTop;
 });
 
 window.addEventListener("mousedown", () => {
   mousedown = true;
+  if (mobile == null) mobile = false;
 });
 window.addEventListener("mouseup", () => {
   mousedown = false;
+  if (mobile == null) mobile = false;
 });
 window.addEventListener("touchstart", () => {
   mousedown = true;
+  if (mobile == null) mobile = true;
 });
 window.addEventListener("touchend", () => {
   mousedown = false;
+  if (mobile == null) mobile = true;
+});
+window.addEventListener("touchmove", (e) => {
+  mouseX = e.clientX;
+  mouseY = e.clientY;
+
+  mcx = mouseX - 10;
+  mcy = mouseY - canvasYCoord + document.documentElement.scrollTop;
 });
 
 function changeBrushSize(amnt) {
@@ -697,7 +711,7 @@ function changeBrushSize(amnt) {
     brushSize += amnt;
   }
   document.getElementById("brushSizer").innerHTML =
-    '<st>5 </st>Brush size: <tb onclick="changeBrushSize(-1)">&lt;</tb> ' +
+    'Brush size: <tb onclick="changeBrushSize(-1)">&lt;</tb> ' +
     brushSize +
     ' <tb onclick="changeBrushSize(1)">&gt;</tb>';
   circlePoints = getCircleCoords(brushSize);

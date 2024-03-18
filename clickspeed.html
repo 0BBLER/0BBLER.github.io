@@ -1,35 +1,37 @@
 <!DOCTYPE html>
 <html id="thingtoclick" onclick="clicked()">
-    <head>
-        <meta charset="UTF-8">
-        <link rel="stylesheet" href="css/style.css">
-        <link rel="icon" type="image/x-icon" href="favicon.ico">
-        <title>0BBLER.github.io</title>
-    </head>
-    <body>
-        
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <title>0BBLER.github.io</title>
+  </head>
+  <body>
+    <div id="titleText" onclick="navigator.clipboard.writeText('https:/\/0bbler.github.io/')" style="font-size: 2.5em; left: 15px; opacity: 1">0BBLER.github.io</div>
+    <div id="l1" class="line" style="top: 4.2em; left: 15px; width: 38em"></div>
+    <div id="desc" style="font-size: 1.5em; left: 15px; top: 3.3em; opacity: 1">Click speed testing thing</div>
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <p></p>
+    <p style="color: rgb(128, 207, 145)">Click anywhere</p>
+    <p></p>
+    <p id="lresult">Left CPS:</p>
+    <p id="rresult">Right CPS:</p>
+    <p id="tresult">Combined CPS:</p>
+    <p id="total">Total clicks:</p>
+    <p></p>
+    <p></p>
+    <p onclick="homeButton()">Back arrow</p>
 
-        <div>
-        <input disabled placeholder="0BBLER.github.io" class="topbar" value="0BBLER.github.io/clickspeed"></input>
-        </div>
+    <canvas id="graph" width="0px" height="0px" style="border: 1px solid white; background-color: rgb(34, 34, 34)"></canvas>
 
-        &nbsp;
-        <p><st>1 </st>Click Speed Measurer</p>
-        <p><st>2 </st></p>
-        <p style="color:rgb(128, 207, 145)"><st>3 </st>Click anywhere</p>
-        <p><st>4 </st></p>
-        <p id="lresult"><st>5 </st>Left CPS: </p>
-        <p id="rresult"><st>6 </st>Right CPS: </p>
-        <p id="tresult"><st>7 </st>Combined CPS: </p>
-        <p id="total"><st>8 </st>Total clicks: </p>
-        <p><st>9 </st></p>
-        <p><st>10 </st></p>
-        <p onclick="homeButton()"><st>11 </st>Back arrow</p>
-
-        <canvas id="graph" width="0px" height="0px" style="border: 1px solid white; background-color: rgb(34, 34, 34);"></canvas>
-
-        <script src="js/clickspeed.js"></script>
-        <script src="js/common.js"></script>
-
-    </body>
+    <script src="js/clickspeed.js"></script>
+    <script src="js/common.js"></script>
+  </body>
 </html>

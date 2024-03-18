@@ -365,8 +365,8 @@ function revealAns() {
     reveal.append(createBigCardBody(testQuestions[questionIdx].answer));
   } else if (testQuestions[questionIdx].type == "choice") {
     let ansAsText = [];
-    questions[questionIdx].choice.correct.map((x, i2) => {
-      if (x) ansAsText.push(questions[questionIdx].choice.options[i2]);
+    testQuestions[questionIdx].choice.correct.map((x, i2) => {
+      if (x) ansAsText.push(testQuestions[questionIdx].choice.options[i2]);
     });
 
     reveal.append(createBigCardBody(ansAsText.toString()));
@@ -742,24 +742,22 @@ function genQuestions() {
           title.style.fontSize = "30px";
           title.style.fontWeight = "bold";
           let someText = document.createElement("p");
-          someText.innerHTML = "Press Esc to escape or Enter to enter";
+          someText.innerHTML = "Press Esc to cancel";
           someText.style.fontSize = "10px";
-          let inputBox = document.createElement("input");
-          inputBox.type = "text";
-          inputBox.placeholder = "type whatever you want here it doesn't matter";
-          inputBox.addEventListener("keydown", (e) => {
-            if (e.key == "Enter") {
-              removeCategory(selectedCategoryPrevVal);
-              genQuestions();
-              removePopup();
-            }
+          let confirmDelete = document.createElement("button");
+          confirmDelete.innerHTML = "confirm";
+          confirmDelete.style.fontSize = "24px";
+          confirmDelete.addEventListener("click", (e) => {
+            removeCategory(selectedCategoryPrevVal);
+            genQuestions();
+            removePopup();
           });
 
           popup.append(title);
           popup.append(someText);
-          popup.append(inputBox);
+          popup.append(confirmDelete);
 
-          inputBox.focus();
+          confirmDelete.focus();
 
           createPopup();
         } else {
@@ -847,6 +845,9 @@ function removePopup() {
 }
 
 function createPopup() {
+  let closeButton = document.createElement("p");
+  closeButton.innerHTML = "x";
+  popup.append(closeButton);
   popup.style.left = "20px";
   popup.opacity = "1";
 }

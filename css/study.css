@@ -45,6 +45,7 @@ button {
   background-color: rgb(210, 210, 210);
   border: 1px solid rgb(200, 200, 200);
   transition-duration: 600ms;
+  cursor: pointer;
 }
 
 button:hover {
